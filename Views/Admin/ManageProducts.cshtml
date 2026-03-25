@@ -1,0 +1,90 @@
+@{
+    Layout = "_AdminLayout";
+    ViewData["Title"] = "Manage Products";
+    var products = ViewBag.Products as IEnumerable<dynamic>;
+}
+
+<div class="container mt-5">
+    <div class="mb-3 d-flex justify-content-between align-items-center">
+        <h3>ระบบจัดการคลังสินค้า (Admin)</h3>
+        <button type="button" class="btn btn-success" data-bs-toggle="modal" data-bs-target="#addProductModal">
+            + เพิ่มสินค้าใหม่
+        </button>
+    </div>
+
+    <div class="modal fade" id="addProductModal" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+                <div class="modal-header bg-success text-white">
+                    <h5 class="modal-title">เพิ่มรองเท้ารุ่นใหม่</h5>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+                </div>
+                <form asp-controller="Admin" asp-action="AddProduct" method="post" enctype="multipart/form-data">
+                    <div class="modal-body">
+                        <div class="row">
+                            <div class="col-md-8 mb-3">
+                                <label class="form-label">ชื่อรุ่นรองเท้า</label>
+                                <input type="text" class="form-control" name="Name" required>
+                            </div>
+                            <div class="col-md-4 mb-3">
+                                <label class="form-label">แบรนด์</label>
+                                <input type="text" class="form-control" name="Brand" placeholder="เช่น Nike, Adidas" required>
+                            </div>
+                        </div>
+                        
+                        <div class="mb-3">
+                            <label class="form-label">รายละเอียดสินค้า</label>
+                            <textarea class="form-control" name="Description" rows="3"></textarea>
+                        </div>
+
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label class="form-label">ราคาขาย (บาท)</label>
+                                <input type="number" step="0.01" class="form-control" name="Price" required>
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label class="form-label">อัปโหลดรูปหน้าปก</label>
+                                <input type="file" class="form-control" name="ImageFile" accept="image/*" required>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">ยกเลิก</button>
+                        <button type="submit" class="btn btn-success">บันทึกสินค้า</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <table class="table table-bordered table-hover align-middle">
+        <thead class="table-dark">
+            <tr class="text-center">
+                <th>รูปภาพ</th>
+                <th>รหัสสินค้า</th>
+                <th>ชื่อสินค้า</th>
+                <th>แบรนด์</th>
+                <th>ราคา</th>
+                <th>จัดการ</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var item in products)
+            {
+                <tr>
+                    <td class="text-center">
+                        <img src="@item.ImageUrl" alt="Product" style="width: 80px; height: 80px; object-fit: cover; border-radius: 8px;" />
+                    </td>
+                    <td class="text-center">@item.ProductId</td>
+                    <td>@item.Name</td>
+                    <td class="text-center"><span class="badge bg-primary">@item.Brand</span></td>
+                    <td class="text-end text-success fw-bold">@item.Price.ToString("N2") ฿</td>
+                    <td class="text-center">
+                        <button class="btn btn-sm btn-outline-warning disabled">แก้ไข</button> 
+                        <a asp-route-id="@item.ProductId" asp-action="DeleteProduct" asp-controller="Admin" class="btn btn-sm btn-outline-danger" onclick="return confirm('ยืนยันการลบสินค้านี้?');">ลบ</a>
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
+</div>

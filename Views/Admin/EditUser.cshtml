@@ -1,0 +1,52 @@
+@model Stepify.Models.Db.User
+@{
+    Layout = "_Layout";
+    ViewData["Title"] = "Edit User";
+}
+
+<div class="container mt-5">
+    <div class="card shadow-sm mx-auto" style="max-width: 500px;">
+        <div class="card-header bg-warning text-dark">
+            <h4 class="mb-0">แก้ไขข้อมูลผู้ใช้งาน</h4>
+        </div>
+        <div class="card-body">
+            <form asp-controller="Admin" asp-action="EditUser" method="post">
+                <input type="hidden" asp-for="UserId" />
+
+                <div class="mb-3">
+                    <label class="form-label">ชื่อ-สกุล</label>
+                    <input type="text" asp-for="Username" class="form-control" required>
+                </div>
+
+                <div class="mb-3">
+                    <label class="form-label">Email</label>
+                    <input type="email" asp-for="Email" class="form-control" required>
+                </div>
+
+                <div class="mb-3">
+                    <label class="form-label">เบอร์โทร</label>
+                    <input type="text" asp-for="Tel" class="form-control">
+                </div>
+
+                <div class="mb-3">
+                    <label class="form-label">Password</label>
+                    <input type="text" asp-for="Password" class="form-control" required>
+                </div>
+
+                <div class="mb-3">
+                    <label class="form-label">Role</label>
+                    <select class="form-select" asp-for="Role">
+                        <option value="Admin">Admin</option>
+                        <option value="Warehouse">Warehouse</option>
+                        <option value="User">Customer</option>
+                    </select>
+                </div>
+
+                <div class="d-grid gap-2">
+                    <button type="submit" class="btn btn-primary">อัปเดตข้อมูล</button>
+                    <a asp-action="ManageUsers" asp-controller="Admin" class="btn btn-outline-secondary">ยกเลิก</a>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>

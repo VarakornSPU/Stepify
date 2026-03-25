@@ -1,0 +1,47 @@
+@{
+    // บังคับให้หน้านี้ใช้กรอบของ Admin Layout ที่เราเพิ่งสร้าง
+    Layout = "_AdminLayout";
+    ViewData["Title"] = "Dashboard";
+}
+
+<div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">
+    <h1 class="h2">ภาพรวมระบบ (Dashboard)</h1>
+</div>
+
+<div class="row">
+    <div class="col-md-4 mb-4">
+        <div class="card text-white bg-primary shadow-sm h-100">
+            <div class="card-body">
+                <h5 class="card-title">👥 ผู้ใช้งานทั้งหมด</h5>
+                <h2 class="display-4 fw-bold">@ViewBag.TotalUsers</h2>
+            </div>
+            <div class="card-footer d-flex justify-content-between align-items-center">
+                <a asp-action="ManageUsers" class="text-white text-decoration-none">จัดการผู้ใช้งาน ➔</a>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-md-4 mb-4">
+        <div class="card text-white bg-success shadow-sm h-100">
+            <div class="card-body">
+                <h5 class="card-title">📦 สินค้าในระบบ</h5>
+                <h2 class="display-4 fw-bold">@ViewBag.TotalProducts</h2>
+            </div>
+            <div class="card-footer d-flex justify-content-between align-items-center">
+                <a asp-action="ManageProducts" class="text-white text-decoration-none">จัดการสินค้า ➔</a>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-md-4 mb-4">
+        <div class="card text-dark bg-warning shadow-sm h-100">
+            <div class="card-body">
+                <h5 class="card-title">🛒 คำสั่งซื้อ (Orders)</h5>
+                <h2 class="display-4 fw-bold">@ViewBag.TotalOrders</h2>
+            </div>
+            <div class="card-footer d-flex justify-content-between align-items-center">
+                <a href="#" class="text-dark text-decoration-none">ดูคำสั่งซื้อทั้งหมด ➔</a>
+            </div>
+        </div>
+    </div>
+</div>

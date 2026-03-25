@@ -1,0 +1,84 @@
+@model List<Stepify.Models.Db.User>
+@{
+    Layout = "_AdminLayout";
+    ViewData["Title"] = "Manage Users";
+}
+
+<div class="container mt-5">
+    <div class="mb-3 d-flex justify-content-between align-items-center">
+        <h3>ระบบจัดการผู้ใช้งาน (Admin)</h3>
+        <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#addUserModal">
+            + เพิ่มผู้ใช้งาน
+        </button>
+    </div>
+
+    <div class="modal fade" id="addUserModal" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">เพิ่มผู้ใช้งานเข้าระบบ</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <form asp-controller="Admin" asp-action="AddUser" method="post">
+                    <div class="modal-body">
+                        <div class="mb-3">
+                            <label class="form-label">ชื่อ-สกุล</label>
+                            <input type="text" class="form-control" name="Username" required>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">Email</label>
+                            <input type="email" class="form-control" name="Email" required>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">เบอร์โทร</label>
+                            <input type="text" class="form-control" name="Tel">
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">Password</label>
+                            <input type="password" class="form-control" name="Password" required>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">Role</label>
+                            <select class="form-select" name="Role">
+                                <option value="Admin">Admin</option>
+                                <option value="Warehouse">Warehouse</option>
+                                <option value="User" selected>User</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">ปิด</button>
+                        <button type="submit" class="btn btn-primary">บันทึกข้อมูล</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <table class="table table-bordered table-striped table-hover">
+        <thead class="table-dark">
+            <tr>
+                <th>รหัส</th>
+                <th>ชื่อ-สกุล</th>
+                <th>Email</th>
+                <th>Role</th>
+                <th>จัดการ</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var u in Model)
+            {
+                <tr>
+                    <td>@u.UserId</td>
+                    <td>@u.Username</td>
+                    <td>@u.Email</td>
+                    <td><span class="badge bg-secondary">@u.Role</span></td>
+                    <td>
+                        <a asp-route-id="@u.UserId" asp-action="EditUser" asp-controller="Admin" class="btn btn-sm btn-warning">แก้ไข</a>
+                        <a asp-route-id="@u.UserId" asp-action="DeleteUser" asp-controller="Admin" class="btn btn-sm btn-danger" onclick="return confirm('ยืนยันการลบข้อมูล?');">ลบ</a>
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
+</div>
