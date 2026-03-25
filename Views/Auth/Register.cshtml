@@ -1,0 +1,47 @@
+@model Stepify.Models.Db.User
+@{
+    Layout = "_AuthLayout";
+    ViewData["Title"] = "Register";
+}
+
+<div class="container mt-5" style="max-width: 500px;">
+    <div class="card shadow-sm">
+        <div class="card-header bg-success text-white text-center py-3">
+            <h4 class="mb-0">สมัครสมาชิก (Register)</h4>
+        </div>
+        <div class="card-body p-4">
+
+            @if (ViewBag.Error != null)
+            {
+                <div class="alert alert-danger text-center">@ViewBag.Error</div>
+            }
+
+            <form asp-controller="Auth" asp-action="Register" method="post">
+                <div class="mb-3">
+                    <label class="form-label">ชื่อ-สกุล</label>
+                    <input type="text" asp-for="Username" class="form-control" placeholder="เช่น Somchai Jaidee" required>
+                </div>
+                <div class="mb-3">
+                    <label class="form-label">Email</label>
+                    <input type="email" asp-for="Email" class="form-control" placeholder="example@email.com" required>
+                </div>
+                <div class="mb-3">
+                    <label class="form-label">เบอร์โทรศัพท์</label>
+                    <input type="text" asp-for="Tel" class="form-control" placeholder="08X-XXX-XXXX">
+                </div>
+                <div class="mb-4">
+                    <label class="form-label">Password</label>
+                    <input type="password" asp-for="Password" class="form-control" placeholder="ตั้งรหัสผ่าน" required>
+                </div>
+                <div class="d-grid">
+                    <button type="submit" class="btn btn-success btn-lg">สมัครสมาชิก</button>
+                </div>
+            </form>
+
+            <hr class="my-4">
+            <div class="text-center">
+                มีบัญชีอยู่แล้ว? <a asp-controller="Auth" asp-action="Login" class="text-decoration-none fw-bold">เข้าสู่ระบบ</a>
+            </div>
+        </div>
+    </div>
+</div>
