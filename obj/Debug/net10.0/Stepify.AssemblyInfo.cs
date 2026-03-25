@@ -13,7 +13,7 @@ using System.Reflection;
 [assembly: System.Reflection.AssemblyCompanyAttribute("Stepify")]
 [assembly: System.Reflection.AssemblyConfigurationAttribute("Debug")]
 [assembly: System.Reflection.AssemblyFileVersionAttribute("1.0.0.0")]
-[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0")]
+[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+0215225be32a5c44bfcccce3472c2dacfcdca54f")]
 [assembly: System.Reflection.AssemblyProductAttribute("Stepify")]
 [assembly: System.Reflection.AssemblyTitleAttribute("Stepify")]
 [assembly: System.Reflection.AssemblyVersionAttribute("1.0.0.0")]

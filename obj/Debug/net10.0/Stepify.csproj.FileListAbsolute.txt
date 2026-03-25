@@ -222,3 +222,4 @@
 /Users/viciousvicky/Desktop/Project CSI402/Stepify/obj/Debug/net10.0/Stepify.pdb
 /Users/viciousvicky/Desktop/Project CSI402/Stepify/obj/Debug/net10.0/Stepify.genruntimeconfig.cache
 /Users/viciousvicky/Desktop/Project CSI402/Stepify/obj/Debug/net10.0/ref/Stepify.dll
+/Users/viciousvicky/Desktop/Project CSI402/Stepify/obj/Debug/net10.0/Stepify.sourcelink.json
