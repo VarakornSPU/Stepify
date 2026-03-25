@@ -1,0 +1,14 @@
+# โฟลเดอร์ที่เกิดจากการ Build (ห้ามเอาขึ้นเด็ดขาด)
+[Bb]in/
+[Oo]bj/
+
+# โฟลเดอร์การตั้งค่าของ Visual Studio / VS Code
+.vs/
+.vscode/
+*.user
+
+# ไฟล์ของระบบปฏิบัติการ (สำหรับคนใช้ Mac)
+.DS_Store
+
+# ถ้ามีไฟล์เก็บความลับชั่วคราว (Environment variables local)
+appsettings.Development.json
