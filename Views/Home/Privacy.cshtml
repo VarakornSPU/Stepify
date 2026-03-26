@@ -1,6 +1,56 @@
 ﻿@{
     ViewData["Title"] = "Privacy Policy";
 }
-<h1>@ViewData["Title"]</h1>
 
-<p>Use this page to detail your site's privacy policy.</p>
+<div class="py-4">
+    <div class="card" style="border: none; border-radius: var(--radius-xl); box-shadow: var(--shadow-card);">
+        <div class="card-body p-4 p-md-5">
+            <h1 class="mb-4" style="font-family: var(--font-heading); font-weight: 700; color: var(--primary-dark);">
+                <i class="fa-solid fa-shield-halved me-2" style="color: var(--accent-coral);"></i>
+                นโยบายความเป็นส่วนตัว
+            </h1>
+            
+            <p class="lead text-muted mb-4">
+                Stepify ให้ความสำคัญกับความเป็นส่วนตัวของลูกค้าทุกท่าน เราจึงขอชี้แจงนโยบายการเก็บรวบรวม ใช้ และเปิดเผยข้อมูลส่วนบุคคลของท่าน
+            </p>
+
+            <hr class="my-4">
+
+            <section class="mb-4">
+                <h5 class="fw-bold mb-3" style="color: var(--primary);">
+                    <i class="fa-solid fa-database me-2"></i>ข้อมูลที่เราเก็บรวบรวม
+                </h5>
+                <ul class="text-muted">
+                    <li>ชื่อ-นามสกุล อีเมล และเบอร์โทรศัพท์ เพื่อการสมัครสมาชิก</li>
+                    <li>ที่อยู่จัดส่ง สำหรับการจัดส่งสินค้า</li>
+                    <li>ประวัติการสั่งซื้อ เพื่อการให้บริการและปรับปรุงประสบการณ์</li>
+                </ul>
+            </section>
+
+            <section class="mb-4">
+                <h5 class="fw-bold mb-3" style="color: var(--primary);">
+                    <i class="fa-solid fa-lock me-2"></i>การรักษาความปลอดภัย
+                </h5>
+                <p class="text-muted">
+                    เราใช้มาตรการรักษาความปลอดภัยที่เหมาะสมเพื่อปกป้องข้อมูลส่วนบุคคลของท่านจากการเข้าถึง การใช้ หรือการเปิดเผยโดยไม่ได้รับอนุญาต
+                </p>
+            </section>
+
+            <section class="mb-4">
+                <h5 class="fw-bold mb-3" style="color: var(--primary);">
+                    <i class="fa-solid fa-envelope me-2"></i>ติดต่อเรา
+                </h5>
+                <p class="text-muted">
+                    หากท่านมีคำถามเกี่ยวกับนโยบายความเป็นส่วนตัวนี้ สามารถติดต่อเราได้ที่ 
+                    <a href="mailto:support@stepify.com" style="color: var(--accent-coral); font-weight: 600;">support@stepify.com</a>
+                </p>
+            </section>
+
+            <div class="mt-5 pt-4 border-top">
+                <a asp-action="Index" class="btn btn-stepify-primary">
+                    <i class="fa-solid fa-arrow-left me-2"></i>กลับหน้าแรก
+                </a>
+            </div>
+        </div>
+    </div>
+</div>

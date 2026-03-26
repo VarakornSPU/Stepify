@@ -1,52 +1,73 @@
 @model Stepify.Models.Db.User
 @{
-    Layout = "_Layout";
+    Layout = "_AdminLayout";
     ViewData["Title"] = "Edit User";
 }
 
-<div class="container mt-5">
-    <div class="card shadow-sm mx-auto" style="max-width: 500px;">
-        <div class="card-header bg-warning text-dark">
-            <h4 class="mb-0">แก้ไขข้อมูลผู้ใช้งาน</h4>
-        </div>
-        <div class="card-body">
-            <form asp-controller="Admin" asp-action="EditUser" method="post">
-                <input type="hidden" asp-for="UserId" />
+<!-- Header -->
+<div class="admin-header">
+    <h1><i class="fa-solid fa-user-pen me-2 text-warning"></i>แก้ไขข้อมูลผู้ใช้งาน</h1>
+    <a asp-action="ManageUsers" asp-controller="Admin" class="btn btn-stepify-outline">
+        <i class="fa-solid fa-arrow-left me-2"></i>กลับไปหน้ารายการ
+    </a>
+</div>
 
-                <div class="mb-3">
-                    <label class="form-label">ชื่อ-สกุล</label>
-                    <input type="text" asp-for="Username" class="form-control" required>
-                </div>
+<!-- Edit Form -->
+<div class="edit-card">
+    <div class="edit-card-header">
+        <h4><i class="fa-solid fa-pen-to-square me-2"></i>แก้ไขข้อมูล #@Model.UserId</h4>
+    </div>
+    <div class="edit-card-body">
+        <form asp-controller="Admin" asp-action="EditUser" method="post">
+            <input type="hidden" asp-for="UserId" />
 
-                <div class="mb-3">
-                    <label class="form-label">Email</label>
-                    <input type="email" asp-for="Email" class="form-control" required>
-                </div>
+            <div class="mb-3">
+                <label class="form-label fw-semibold">
+                    <i class="fa-solid fa-user me-1 text-muted"></i> ชื่อ-นามสกุล
+                </label>
+                <input type="text" asp-for="Username" class="form-control" required>
+            </div>
 
-                <div class="mb-3">
-                    <label class="form-label">เบอร์โทร</label>
-                    <input type="text" asp-for="Tel" class="form-control">
-                </div>
+            <div class="mb-3">
+                <label class="form-label fw-semibold">
+                    <i class="fa-solid fa-envelope me-1 text-muted"></i> อีเมล
+                </label>
+                <input type="email" asp-for="Email" class="form-control" required>
+            </div>
 
-                <div class="mb-3">
-                    <label class="form-label">Password</label>
-                    <input type="text" asp-for="Password" class="form-control" required>
-                </div>
+            <div class="mb-3">
+                <label class="form-label fw-semibold">
+                    <i class="fa-solid fa-phone me-1 text-muted"></i> เบอร์โทรศัพท์
+                </label>
+                <input type="text" asp-for="Tel" class="form-control">
+            </div>
 
-                <div class="mb-3">
-                    <label class="form-label">Role</label>
-                    <select class="form-select" asp-for="Role">
-                        <option value="Admin">Admin</option>
-                        <option value="Warehouse">Warehouse</option>
-                        <option value="User">Customer</option>
-                    </select>
-                </div>
+            <div class="mb-3">
+                <label class="form-label fw-semibold">
+                    <i class="fa-solid fa-lock me-1 text-muted"></i> รหัสผ่าน
+                </label>
+                <input type="text" asp-for="Password" class="form-control" required>
+            </div>
 
-                <div class="d-grid gap-2">
-                    <button type="submit" class="btn btn-primary">อัปเดตข้อมูล</button>
-                    <a asp-action="ManageUsers" asp-controller="Admin" class="btn btn-outline-secondary">ยกเลิก</a>
-                </div>
-            </form>
-        </div>
+            <div class="mb-4">
+                <label class="form-label fw-semibold">
+                    <i class="fa-solid fa-user-tag me-1 text-muted"></i> บทบาท
+                </label>
+                <select class="form-select" asp-for="Role">
+                    <option value="User">User</option>
+                    <option value="Warehouse">Warehouse</option>
+                    <option value="Admin">Admin</option>
+                </select>
+            </div>
+
+            <div class="d-grid gap-2">
+                <button type="submit" class="btn btn-stepify-primary btn-lg">
+                    <i class="fa-solid fa-save me-2"></i>บันทึกการเปลี่ยนแปลง
+                </button>
+                <a asp-action="ManageUsers" asp-controller="Admin" class="btn btn-stepify-outline">
+                    ยกเลิก
+                </a>
+            </div>
+        </form>
     </div>
 </div>
