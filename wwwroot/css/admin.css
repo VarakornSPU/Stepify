@@ -1,0 +1,328 @@
+/* ====================================
+   STEPIFY - Admin Dashboard Styles
+   ==================================== */
+
+/* ===== Admin Sidebar ===== */
+.admin-sidebar {
+    background: linear-gradient(180deg, var(--neutral-900) 0%, var(--neutral-800) 100%);
+    min-height: 100vh;
+    width: 280px;
+    padding: 1.5rem;
+    display: flex;
+    flex-direction: column;
+}
+
+.admin-brand {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    color: var(--white);
+    font-family: var(--font-heading);
+    font-size: 1.35rem;
+    font-weight: 700;
+    margin-bottom: 2rem;
+    padding-bottom: 1.5rem;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.admin-brand i {
+    color: var(--accent-coral);
+    font-size: 1.5rem;
+}
+
+/* ===== Admin Navigation ===== */
+.admin-nav {
+    flex: 1;
+}
+
+.admin-nav .nav-item {
+    margin-bottom: 0.5rem;
+}
+
+.admin-nav .nav-link {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    color: var(--neutral-400);
+    padding: 0.875rem 1rem;
+    border-radius: var(--radius-md);
+    font-weight: 500;
+    transition: all var(--transition-fast);
+}
+
+.admin-nav .nav-link i {
+    width: 24px;
+    text-align: center;
+    font-size: 1.1rem;
+}
+
+.admin-nav .nav-link:hover {
+    background: rgba(255, 255, 255, 0.05);
+    color: var(--white);
+}
+
+.admin-nav .nav-link.active {
+    background: linear-gradient(135deg, var(--primary) 0%, var(--primary-accent) 100%);
+    color: var(--white);
+    box-shadow: 0 4px 15px rgba(41, 121, 255, 0.3);
+}
+
+/* ===== Admin User Profile ===== */
+.admin-user {
+    padding-top: 1.5rem;
+    border-top: 1px solid rgba(255, 255, 255, 0.1);
+    margin-top: auto;
+}
+
+.admin-user-btn {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    color: var(--white);
+    background: transparent;
+    border: none;
+    padding: 0;
+    width: 100%;
+    text-align: left;
+}
+
+.admin-user-avatar {
+    width: 40px;
+    height: 40px;
+    border-radius: var(--radius-full);
+    border: 2px solid var(--primary-accent);
+}
+
+.admin-user-info {
+    flex: 1;
+}
+
+.admin-user-name {
+    font-weight: 600;
+    font-size: 0.9rem;
+}
+
+.admin-user-role {
+    font-size: 0.75rem;
+    color: var(--neutral-400);
+}
+
+/* ===== Admin Main Content ===== */
+.admin-main {
+    flex: 1;
+    background: var(--neutral-100);
+    min-height: 100vh;
+    padding: 2rem;
+}
+
+.admin-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 2rem;
+    padding-bottom: 1.5rem;
+    border-bottom: 2px solid var(--neutral-200);
+}
+
+.admin-header h1 {
+    font-family: var(--font-heading);
+    font-size: 1.75rem;
+    font-weight: 700;
+    color: var(--neutral-900);
+    margin: 0;
+}
+
+/* ===== Dashboard Cards ===== */
+.dashboard-card {
+    background: var(--white);
+    border-radius: var(--radius-xl);
+    box-shadow: var(--shadow-card);
+    overflow: hidden;
+    transition: all var(--transition-normal);
+    height: 100%;
+}
+
+.dashboard-card:hover {
+    transform: translateY(-4px);
+    box-shadow: var(--shadow-card-hover);
+}
+
+.dashboard-card-body {
+    padding: 1.5rem;
+}
+
+.dashboard-card-icon {
+    width: 48px;
+    height: 48px;
+    border-radius: var(--radius-lg);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.25rem;
+    margin-bottom: 1rem;
+}
+
+.dashboard-card-icon.users {
+    background: linear-gradient(135deg, var(--primary) 0%, var(--primary-accent) 100%);
+    color: var(--white);
+}
+
+.dashboard-card-icon.products {
+    background: linear-gradient(135deg, var(--accent-success) 0%, #00e676 100%);
+    color: var(--white);
+}
+
+.dashboard-card-icon.orders {
+    background: linear-gradient(135deg, var(--accent-warning) 0%, #ffca28 100%);
+    color: var(--neutral-800);
+}
+
+.dashboard-card-title {
+    font-size: 0.875rem;
+    font-weight: 600;
+    color: var(--neutral-500);
+    margin-bottom: 0.5rem;
+}
+
+.dashboard-card-value {
+    font-family: var(--font-heading);
+    font-size: 2.5rem;
+    font-weight: 800;
+    color: var(--neutral-900);
+}
+
+.dashboard-card-footer {
+    background: var(--neutral-50);
+    padding: 0.875rem 1.5rem;
+    border-top: 1px solid var(--neutral-200);
+}
+
+.dashboard-card-link {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    color: var(--primary);
+    font-weight: 600;
+    font-size: 0.875rem;
+}
+
+.dashboard-card-link:hover {
+    color: var(--primary-dark);
+}
+
+/* ===== Admin Tables ===== */
+.admin-table-wrapper {
+    background: var(--white);
+    border-radius: var(--radius-xl);
+    box-shadow: var(--shadow-card);
+    overflow: hidden;
+}
+
+.admin-table {
+    margin-bottom: 0;
+}
+
+.admin-table thead {
+    background: linear-gradient(135deg, var(--neutral-800) 0%, var(--neutral-700) 100%);
+}
+
+.admin-table thead th {
+    color: var(--white);
+    font-weight: 600;
+    padding: 1rem 1.25rem;
+    border: none;
+    font-size: 0.875rem;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+.admin-table tbody td {
+    padding: 1rem 1.25rem;
+    vertical-align: middle;
+    border-bottom: 1px solid var(--neutral-200);
+}
+
+.admin-table tbody tr:hover {
+    background: var(--neutral-50);
+}
+
+.admin-table tbody tr:last-child td {
+    border-bottom: none;
+}
+
+/* ===== Role Badges ===== */
+.admin-table .badge-role {
+    padding: 0.375rem 0.75rem;
+    font-weight: 600;
+    font-size: 0.75rem;
+    border-radius: var(--radius-full);
+}
+
+.admin-table .badge-admin {
+    background: linear-gradient(135deg, var(--accent-coral) 0%, var(--accent-orange) 100%);
+    color: var(--white);
+}
+
+.admin-table .badge-warehouse {
+    background: linear-gradient(135deg, var(--accent-warning) 0%, #ffca28 100%);
+    color: var(--neutral-800);
+}
+
+.admin-table .badge-user {
+    background: linear-gradient(135deg, var(--primary) 0%, var(--primary-accent) 100%);
+    color: var(--white);
+}
+
+/* ===== Product Image in Table ===== */
+.admin-table .product-img {
+    width: 60px;
+    height: 60px;
+    object-fit: cover;
+    border-radius: var(--radius-md);
+    background: var(--neutral-100);
+}
+
+/* ===== Edit User Card ===== */
+.edit-card {
+    background: var(--white);
+    border-radius: var(--radius-xl);
+    box-shadow: var(--shadow-card);
+    overflow: hidden;
+    max-width: 500px;
+    margin: 2rem auto;
+}
+
+.edit-card-header {
+    background: linear-gradient(135deg, var(--accent-warning) 0%, #ffca28 100%);
+    color: var(--neutral-800);
+    padding: 1.25rem 1.5rem;
+}
+
+.edit-card-header h4 {
+    font-family: var(--font-heading);
+    font-weight: 700;
+    margin: 0;
+    color: var(--neutral-800);
+}
+
+.edit-card-body {
+    padding: 1.5rem;
+}
+
+/* ===== Responsive ===== */
+@media (max-width: 767.98px) {
+    .admin-sidebar {
+        width: 100%;
+        min-height: auto;
+    }
+    
+    .admin-main {
+        padding: 1rem;
+    }
+    
+    .admin-header {
+        flex-direction: column;
+        gap: 1rem;
+        align-items: flex-start;
+    }
+}

@@ -13,16 +13,20 @@
     <!-- Stylesheets -->
     <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
-    <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
+    
+    <!-- Modular CSS Files (Auth specific) -->
+    <link rel="stylesheet" href="~/css/base.css" asp-append-version="true" />
+    <link rel="stylesheet" href="~/css/auth.css" asp-append-version="true" />
+    <link rel="stylesheet" href="~/css/components.css" asp-append-version="true" />
 </head>
-<body style="background: linear-gradient(135deg, #1a237e 0%, #303f9f 50%, #1976d2 100%); min-height: 100vh;">
+<body style="background: linear-gradient(135deg, var(--primary-dark) 0%, var(--primary) 50%, var(--secondary) 100%); min-height: 100vh;">
     
     <!-- Header -->
     <header>
         <nav class="navbar navbar-light py-3">
             <div class="container justify-content-center">
-                <a class="navbar-brand d-flex align-items-center gap-2" href="/" style="font-family: 'Poppins', sans-serif; font-weight: 700; font-size: 1.75rem; color: #fff;">
-                    <i class="fa-solid fa-shoe-prints" style="color: #ff6f61;"></i>
+                <a class="navbar-brand d-flex align-items-center gap-2" href="/" style="font-family: var(--font-heading); font-weight: 700; font-size: 1.75rem; color: var(--white);">
+                    <i class="fa-solid fa-shoe-prints" style="color: var(--accent-coral);"></i>
                     <span>Stepify</span>
                 </a>
             </div>

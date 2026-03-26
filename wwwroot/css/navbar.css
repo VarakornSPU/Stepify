@@ -1,0 +1,212 @@
+/* ====================================
+   STEPIFY - Navbar Styles
+   ==================================== */
+
+/* ===== Main Navbar ===== */
+.navbar-stepify {
+    background: linear-gradient(135deg, var(--primary-dark) 0%, var(--primary) 100%);
+    padding: 0.75rem 0;
+    box-shadow: var(--shadow-lg);
+}
+
+.navbar-stepify .navbar-brand {
+    font-family: var(--font-heading);
+    font-weight: 700;
+    font-size: 1.5rem;
+    color: var(--white) !important;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.navbar-stepify .navbar-brand i {
+    color: var(--accent-coral);
+}
+
+.navbar-stepify .nav-link {
+    color: rgba(255, 255, 255, 0.85) !important;
+    font-weight: 500;
+    padding: 0.5rem 1rem !important;
+    border-radius: var(--radius-md);
+    transition: all var(--transition-fast);
+}
+
+.navbar-stepify .nav-link:hover {
+    color: var(--white) !important;
+    background-color: rgba(255, 255, 255, 0.1);
+}
+
+.navbar-stepify .navbar-toggler {
+    border-color: rgba(255, 255, 255, 0.3);
+}
+
+.navbar-stepify .navbar-toggler-icon {
+    background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 30 30'%3e%3cpath stroke='rgba%28255, 255, 255, 0.85%29' stroke-linecap='round' stroke-miterlimit='10' stroke-width='2' d='M4 7h22M4 15h22M4 23h22'/%3e%3c/svg%3e");
+}
+
+/* ===== Search Form in Navbar ===== */
+.search-form-wrapper {
+    position: relative;
+}
+
+.search-form-wrapper .form-control {
+    background-color: rgba(255, 255, 255, 0.15);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    color: var(--white);
+    padding-left: 1rem;
+    padding-right: 3rem;
+    border-radius: var(--radius-full);
+    min-width: 250px;
+    transition: all var(--transition-normal);
+}
+
+.search-form-wrapper .form-control::placeholder {
+    color: rgba(255, 255, 255, 0.6);
+}
+
+.search-form-wrapper .form-control:focus {
+    background-color: var(--white);
+    color: var(--neutral-800);
+    border-color: var(--white);
+    box-shadow: 0 0 0 3px rgba(255, 255, 255, 0.3);
+}
+
+.search-form-wrapper .form-control:focus::placeholder {
+    color: var(--neutral-400);
+}
+
+.search-form-wrapper .btn-search {
+    position: absolute;
+    right: 4px;
+    top: 50%;
+    transform: translateY(-50%);
+    background: var(--accent-coral);
+    border: none;
+    color: var(--white);
+    width: 36px;
+    height: 36px;
+    border-radius: var(--radius-full);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all var(--transition-fast);
+}
+
+.search-form-wrapper .btn-search:hover {
+    background: var(--accent-orange);
+    transform: translateY(-50%) scale(1.05);
+}
+
+/* ===== Cart Icon ===== */
+.cart-icon-wrapper {
+    position: relative;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    padding: 0.5rem;
+    color: var(--white);
+    font-size: 1.25rem;
+    transition: all var(--transition-fast);
+}
+
+.cart-icon-wrapper:hover {
+    transform: scale(1.1);
+}
+
+.cart-badge {
+    position: absolute;
+    top: 0;
+    right: -2px;
+    background: var(--accent-coral);
+    color: var(--white);
+    font-size: 0.65rem;
+    font-weight: 700;
+    min-width: 18px;
+    height: 18px;
+    border-radius: var(--radius-full);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border: 2px solid var(--primary-dark);
+}
+
+/* ===== User Dropdown ===== */
+.user-dropdown .dropdown-toggle {
+    background: rgba(255, 255, 255, 0.1);
+    border-radius: var(--radius-full);
+    padding: 0.4rem 1rem !important;
+}
+
+.user-dropdown .dropdown-menu {
+    border: none;
+    border-radius: var(--radius-lg);
+    box-shadow: var(--shadow-xl);
+    padding: 0.5rem;
+    margin-top: 0.5rem;
+}
+
+.user-dropdown .dropdown-item {
+    border-radius: var(--radius-md);
+    padding: 0.625rem 1rem;
+    font-weight: 500;
+    transition: all var(--transition-fast);
+}
+
+.user-dropdown .dropdown-item:hover {
+    background-color: var(--neutral-100);
+}
+
+.user-dropdown .dropdown-item i {
+    width: 20px;
+    margin-right: 0.5rem;
+}
+
+/* ===== Auth Buttons ===== */
+.btn-auth-login {
+    background: transparent;
+    border: 2px solid var(--white);
+    color: var(--white);
+    font-weight: 600;
+    padding: 0.5rem 1.25rem;
+    border-radius: var(--radius-full);
+    transition: all var(--transition-fast);
+}
+
+.btn-auth-login:hover {
+    background: var(--white);
+    color: var(--primary-dark);
+}
+
+.btn-auth-register {
+    background: var(--accent-coral);
+    border: 2px solid var(--accent-coral);
+    color: var(--white);
+    font-weight: 600;
+    padding: 0.5rem 1.25rem;
+    border-radius: var(--radius-full);
+    transition: all var(--transition-fast);
+}
+
+.btn-auth-register:hover {
+    background: var(--accent-orange);
+    border-color: var(--accent-orange);
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(255, 111, 97, 0.4);
+}
+
+/* ===== Responsive ===== */
+@media (max-width: 991.98px) {
+    .search-form-wrapper .form-control {
+        min-width: 180px;
+    }
+}
+
+@media (max-width: 767.98px) {
+    .search-form-wrapper {
+        margin: 1rem 0;
+    }
+    
+    .search-form-wrapper .form-control {
+        min-width: 100%;
+    }
+}
