@@ -1,40 +1,43 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="th">
 <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>@ViewData["Title"] - Stepify Authentication</title>
+    <title>@ViewData["Title"] - Stepify</title>
+    
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Poppins:wght@600;700;800&display=swap" rel="stylesheet">
+    
+    <!-- Stylesheets -->
     <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
     <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <style>
-        /* ปรับพื้นหลังให้เป็นสีเทาอ่อนสบายตา */
-        body { 
-            background-color: #f4f6f9; 
-            height: 100vh;
-            display: flex;
-            flex-direction: column;
-        }
-    </style>
 </head>
-<body>
+<body style="background: linear-gradient(135deg, #1a237e 0%, #303f9f 50%, #1976d2 100%); min-height: 100vh;">
+    
+    <!-- Header -->
     <header>
-        <nav class="navbar navbar-light bg-white border-bottom shadow-sm mb-5">
-            <div class="container justify-content-center py-2">
-                <a class="navbar-brand fw-bold text-primary fs-3 m-0" href="/">
-                    <i class="fa-solid fa-shoe-prints"></i> Stepify
+        <nav class="navbar navbar-light py-3">
+            <div class="container justify-content-center">
+                <a class="navbar-brand d-flex align-items-center gap-2" href="/" style="font-family: 'Poppins', sans-serif; font-weight: 700; font-size: 1.75rem; color: #fff;">
+                    <i class="fa-solid fa-shoe-prints" style="color: #ff6f61;"></i>
+                    <span>Stepify</span>
                 </a>
             </div>
         </nav>
     </header>
 
-    <div class="container flex-grow-1">
-        <main role="main">
+    <!-- Main Content -->
+    <div class="container">
+        <main role="main" class="auth-wrapper">
             @RenderBody()
         </main>
     </div>
 
-    <footer class="py-3 text-muted text-center mt-auto">
+    <!-- Footer -->
+    <footer class="py-4 text-center" style="color: rgba(255, 255, 255, 0.6);">
         <small>&copy; 2026 Stepify. All rights reserved.</small>
     </footer>
 

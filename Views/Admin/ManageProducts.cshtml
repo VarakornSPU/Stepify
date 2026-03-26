@@ -4,84 +4,124 @@
     var products = ViewBag.Products as IEnumerable<dynamic>;
 }
 
-<div class="container mt-5">
-    <div class="mb-3 d-flex justify-content-between align-items-center">
-        <h3>ระบบจัดการคลังสินค้า (Admin)</h3>
-        <button type="button" class="btn btn-success" data-bs-toggle="modal" data-bs-target="#addProductModal">
-            + เพิ่มสินค้าใหม่
-        </button>
-    </div>
+<!-- Header -->
+<div class="admin-header">
+    <h1><i class="fa-solid fa-boxes-stacked me-2 text-success"></i>จัดการสินค้า</h1>
+    <button type="button" class="btn btn-stepify-success" data-bs-toggle="modal" data-bs-target="#addProductModal">
+        <i class="fa-solid fa-plus me-2"></i>เพิ่มสินค้าใหม่
+    </button>
+</div>
 
-    <div class="modal fade" id="addProductModal" tabindex="-1" aria-hidden="true">
-        <div class="modal-dialog modal-lg">
-            <div class="modal-content">
-                <div class="modal-header bg-success text-white">
-                    <h5 class="modal-title">เพิ่มรองเท้ารุ่นใหม่</h5>
-                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
-                </div>
-                <form asp-controller="Admin" asp-action="AddProduct" method="post" enctype="multipart/form-data">
-                    <div class="modal-body">
-                        <div class="row">
-                            <div class="col-md-8 mb-3">
-                                <label class="form-label">ชื่อรุ่นรองเท้า</label>
-                                <input type="text" class="form-control" name="Name" required>
-                            </div>
-                            <div class="col-md-4 mb-3">
-                                <label class="form-label">แบรนด์</label>
-                                <input type="text" class="form-control" name="Brand" placeholder="เช่น Nike, Adidas" required>
-                            </div>
-                        </div>
-                        
-                        <div class="mb-3">
-                            <label class="form-label">รายละเอียดสินค้า</label>
-                            <textarea class="form-control" name="Description" rows="3"></textarea>
-                        </div>
-
-                        <div class="row">
-                            <div class="col-md-6 mb-3">
-                                <label class="form-label">ราคาขาย (บาท)</label>
-                                <input type="number" step="0.01" class="form-control" name="Price" required>
-                            </div>
-                            <div class="col-md-6 mb-3">
-                                <label class="form-label">อัปโหลดรูปหน้าปก</label>
-                                <input type="file" class="form-control" name="ImageFile" accept="image/*" required>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="modal-footer">
-                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">ยกเลิก</button>
-                        <button type="submit" class="btn btn-success">บันทึกสินค้า</button>
-                    </div>
-                </form>
+<!-- Add Product Modal -->
+<div class="modal fade modal-stepify" id="addProductModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-lg modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header success">
+                <h5 class="modal-title">
+                    <i class="fa-solid fa-shoe-prints me-2"></i>เพิ่มรองเท้ารุ่นใหม่
+                </h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
             </div>
+            <form asp-controller="Admin" asp-action="AddProduct" method="post" enctype="multipart/form-data">
+                <div class="modal-body">
+                    <div class="row">
+                        <div class="col-md-8 mb-3">
+                            <label class="form-label fw-semibold">ชื่อรุ่นรองเท้า</label>
+                            <input type="text" class="form-control" name="Name" placeholder="เช่น Nike Air Max 90" required>
+                        </div>
+                        <div class="col-md-4 mb-3">
+                            <label class="form-label fw-semibold">แบรนด์</label>
+                            <input type="text" class="form-control" name="Brand" placeholder="เช่น Nike, Adidas" required>
+                        </div>
+                    </div>
+                    
+                    <div class="mb-3">
+                        <label class="form-label fw-semibold">รายละเอียดสินค้า</label>
+                        <textarea class="form-control" name="Description" rows="3" placeholder="อธิบายคุณสมบัติและจุดเด่นของสินค้า..."></textarea>
+                    </div>
+
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label fw-semibold">ราคาขาย (บาท)</label>
+                            <div class="input-group">
+                                <span class="input-group-text"><i class="fa-solid fa-tag"></i></span>
+                                <input type="number" step="0.01" class="form-control" name="Price" placeholder="0.00" required>
+                                <span class="input-group-text">THB</span>
+                            </div>
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label fw-semibold">รูปภาพสินค้า</label>
+                            <input type="file" class="form-control" name="ImageFile" accept="image/*" required>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-stepify-outline" data-bs-dismiss="modal">ยกเลิก</button>
+                    <button type="submit" class="btn btn-stepify-success">
+                        <i class="fa-solid fa-check me-1"></i>บันทึกสินค้า
+                    </button>
+                </div>
+            </form>
         </div>
     </div>
+</div>
 
-    <table class="table table-bordered table-hover align-middle">
-        <thead class="table-dark">
-            <tr class="text-center">
-                <th>รูปภาพ</th>
-                <th>รหัสสินค้า</th>
+<!-- Products Table -->
+<div class="admin-table-wrapper">
+    <table class="table admin-table">
+        <thead>
+            <tr>
+                <th style="width: 100px;" class="text-center">รูปภาพ</th>
+                <th style="width: 80px;">รหัส</th>
                 <th>ชื่อสินค้า</th>
-                <th>แบรนด์</th>
-                <th>ราคา</th>
-                <th>จัดการ</th>
+                <th style="width: 120px;" class="text-center">แบรนด์</th>
+                <th style="width: 130px;" class="text-end">ราคา</th>
+                <th style="width: 150px;" class="text-center">จัดการ</th>
             </tr>
         </thead>
         <tbody>
-            @foreach (var item in products)
+            @if (products != null && products.Any())
+            {
+                @foreach (var item in products)
+                {
+                    <tr>
+                        <td class="text-center">
+                            <img src="@item.ImageUrl" alt="@item.Name" class="product-img">
+                        </td>
+                        <td class="fw-semibold text-muted">#@item.ProductId</td>
+                        <td>
+                            <span class="fw-semibold">@item.Name</span>
+                        </td>
+                        <td class="text-center">
+                            <span class="badge badge-role badge-user">@item.Brand</span>
+                        </td>
+                        <td class="text-end">
+                            <span class="fw-bold" style="color: var(--accent-coral);">@item.Price.ToString("N0") THB</span>
+                        </td>
+                        <td class="text-center">
+                            <div class="d-flex justify-content-center gap-2">
+                                <button class="btn btn-action btn-action-edit" disabled title="Coming Soon">
+                                    <i class="fa-solid fa-pen-to-square"></i>
+                                </button>
+                                <a asp-route-id="@item.ProductId" asp-action="DeleteProduct" asp-controller="Admin" 
+                                   class="btn btn-action btn-action-delete"
+                                   onclick="return confirm('คุณแน่ใจหรือไม่ว่าต้องการลบสินค้านี้?');">
+                                    <i class="fa-solid fa-trash"></i>
+                                </a>
+                            </div>
+                        </td>
+                    </tr>
+                }
+            }
+            else
             {
                 <tr>
-                    <td class="text-center">
-                        <img src="@item.ImageUrl" alt="Product" style="width: 80px; height: 80px; object-fit: cover; border-radius: 8px;" />
-                    </td>
-                    <td class="text-center">@item.ProductId</td>
-                    <td>@item.Name</td>
-                    <td class="text-center"><span class="badge bg-primary">@item.Brand</span></td>
-                    <td class="text-end text-success fw-bold">@item.Price.ToString("N2") ฿</td>
-                    <td class="text-center">
-                        <button class="btn btn-sm btn-outline-warning disabled">แก้ไข</button> 
-                        <a asp-route-id="@item.ProductId" asp-action="DeleteProduct" asp-controller="Admin" class="btn btn-sm btn-outline-danger" onclick="return confirm('ยืนยันการลบสินค้านี้?');">ลบ</a>
+                    <td colspan="6">
+                        <div class="empty-state py-5">
+                            <i class="fa-solid fa-box-open empty-state-icon"></i>
+                            <h3 class="empty-state-title">ยังไม่มีสินค้าในระบบ</h3>
+                            <p class="empty-state-text">เริ่มต้นโดยการเพิ่มสินค้าใหม่</p>
+                        </div>
                     </td>
                 </tr>
             }

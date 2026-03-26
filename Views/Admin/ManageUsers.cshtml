@@ -4,78 +4,125 @@
     ViewData["Title"] = "Manage Users";
 }
 
-<div class="container mt-5">
-    <div class="mb-3 d-flex justify-content-between align-items-center">
-        <h3>ระบบจัดการผู้ใช้งาน (Admin)</h3>
-        <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#addUserModal">
-            + เพิ่มผู้ใช้งาน
-        </button>
-    </div>
+<!-- Header -->
+<div class="admin-header">
+    <h1><i class="fa-solid fa-users me-2 text-primary"></i>จัดการผู้ใช้งาน</h1>
+    <button type="button" class="btn btn-stepify-primary" data-bs-toggle="modal" data-bs-target="#addUserModal">
+        <i class="fa-solid fa-user-plus me-2"></i>เพิ่มผู้ใช้งาน
+    </button>
+</div>
 
-    <div class="modal fade" id="addUserModal" tabindex="-1" aria-hidden="true">
-        <div class="modal-dialog">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h5 class="modal-title">เพิ่มผู้ใช้งานเข้าระบบ</h5>
-                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                </div>
-                <form asp-controller="Admin" asp-action="AddUser" method="post">
-                    <div class="modal-body">
-                        <div class="mb-3">
-                            <label class="form-label">ชื่อ-สกุล</label>
-                            <input type="text" class="form-control" name="Username" required>
-                        </div>
-                        <div class="mb-3">
-                            <label class="form-label">Email</label>
-                            <input type="email" class="form-control" name="Email" required>
-                        </div>
-                        <div class="mb-3">
-                            <label class="form-label">เบอร์โทร</label>
-                            <input type="text" class="form-control" name="Tel">
-                        </div>
-                        <div class="mb-3">
-                            <label class="form-label">Password</label>
-                            <input type="password" class="form-control" name="Password" required>
-                        </div>
-                        <div class="mb-3">
-                            <label class="form-label">Role</label>
-                            <select class="form-select" name="Role">
-                                <option value="Admin">Admin</option>
-                                <option value="Warehouse">Warehouse</option>
-                                <option value="User" selected>User</option>
-                            </select>
-                        </div>
-                    </div>
-                    <div class="modal-footer">
-                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">ปิด</button>
-                        <button type="submit" class="btn btn-primary">บันทึกข้อมูล</button>
-                    </div>
-                </form>
+<!-- Add User Modal -->
+<div class="modal fade modal-stepify" id="addUserModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">
+                    <i class="fa-solid fa-user-plus me-2"></i>เพิ่มผู้ใช้งานใหม่
+                </h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
+            <form asp-controller="Admin" asp-action="AddUser" method="post">
+                <div class="modal-body">
+                    <div class="mb-3">
+                        <label class="form-label fw-semibold">ชื่อ-นามสกุล</label>
+                        <input type="text" class="form-control" name="Username" placeholder="กรอกชื่อ-นามสกุล" required>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label fw-semibold">อีเมล</label>
+                        <input type="email" class="form-control" name="Email" placeholder="email@example.com" required>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label fw-semibold">เบอร์โทรศัพท์</label>
+                        <input type="text" class="form-control" name="Tel" placeholder="08X-XXX-XXXX">
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label fw-semibold">รหัสผ่าน</label>
+                        <input type="password" class="form-control" name="Password" placeholder="ตั้งรหัสผ่าน" required>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label fw-semibold">บทบาท (Role)</label>
+                        <select class="form-select" name="Role">
+                            <option value="User" selected>Customer</option>
+                            <option value="Warehouse">Warehouse</option>
+                            <option value="Admin">Admin</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-stepify-outline" data-bs-dismiss="modal">ยกเลิก</button>
+                    <button type="submit" class="btn btn-stepify-primary">
+                        <i class="fa-solid fa-check me-1"></i>บันทึก
+                    </button>
+                </div>
+            </form>
         </div>
     </div>
+</div>
 
-    <table class="table table-bordered table-striped table-hover">
-        <thead class="table-dark">
+<!-- Users Table -->
+<div class="admin-table-wrapper">
+    <table class="table admin-table">
+        <thead>
             <tr>
-                <th>รหัส</th>
-                <th>ชื่อ-สกุล</th>
-                <th>Email</th>
-                <th>Role</th>
-                <th>จัดการ</th>
+                <th style="width: 80px;">รหัส</th>
+                <th>ชื่อ-นามสกุล</th>
+                <th>อีเมล</th>
+                <th style="width: 120px;">บทบาท</th>
+                <th style="width: 150px;" class="text-center">จัดการ</th>
             </tr>
         </thead>
         <tbody>
-            @foreach (var u in Model)
+            @if (Model != null && Model.Any())
+            {
+                @foreach (var u in Model)
+                {
+                    <tr>
+                        <td class="fw-semibold text-muted">#@u.UserId</td>
+                        <td>
+                            <div class="d-flex align-items-center gap-2">
+                                <img src="https://ui-avatars.com/api/?name=@Uri.EscapeDataString(u.Username ?? "U")&background=303f9f&color=fff&size=36" 
+                                     alt="@u.Username" class="rounded-circle" style="width: 36px; height: 36px;">
+                                <span class="fw-semibold">@u.Username</span>
+                            </div>
+                        </td>
+                        <td class="text-muted">@u.Email</td>
+                        <td>
+                            @{
+                                var badgeClass = u.Role switch
+                                {
+                                    "Admin" => "badge-admin",
+                                    "Warehouse" => "badge-warehouse",
+                                    _ => "badge-user"
+                                };
+                            }
+                            <span class="badge badge-role @badgeClass">@u.Role</span>
+                        </td>
+                        <td class="text-center">
+                            <div class="d-flex justify-content-center gap-2">
+                                <a asp-route-id="@u.UserId" asp-action="EditUser" asp-controller="Admin" 
+                                   class="btn btn-action btn-action-edit">
+                                    <i class="fa-solid fa-pen-to-square"></i>
+                                </a>
+                                <a asp-route-id="@u.UserId" asp-action="DeleteUser" asp-controller="Admin" 
+                                   class="btn btn-action btn-action-delete"
+                                   onclick="return confirm('คุณแน่ใจหรือไม่ว่าต้องการลบผู้ใช้นี้?');">
+                                    <i class="fa-solid fa-trash"></i>
+                                </a>
+                            </div>
+                        </td>
+                    </tr>
+                }
+            }
+            else
             {
                 <tr>
-                    <td>@u.UserId</td>
-                    <td>@u.Username</td>
-                    <td>@u.Email</td>
-                    <td><span class="badge bg-secondary">@u.Role</span></td>
-                    <td>
-                        <a asp-route-id="@u.UserId" asp-action="EditUser" asp-controller="Admin" class="btn btn-sm btn-warning">แก้ไข</a>
-                        <a asp-route-id="@u.UserId" asp-action="DeleteUser" asp-controller="Admin" class="btn btn-sm btn-danger" onclick="return confirm('ยืนยันการลบข้อมูล?');">ลบ</a>
+                    <td colspan="5">
+                        <div class="empty-state py-5">
+                            <i class="fa-solid fa-users-slash empty-state-icon"></i>
+                            <h3 class="empty-state-title">ยังไม่มีข้อมูลผู้ใช้งาน</h3>
+                            <p class="empty-state-text">เริ่มต้นโดยการเพิ่มผู้ใช้งานใหม่</p>
+                        </div>
                     </td>
                 </tr>
             }

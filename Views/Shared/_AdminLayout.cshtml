@@ -1,73 +1,103 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="th">
 <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>@ViewData["Title"] - Stepify Admin</title>
+    
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Poppins:wght@600;700;800&display=swap" rel="stylesheet">
+    
+    <!-- Stylesheets -->
     <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
     <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
-    <style>
-        .sidebar { min-height: 100vh; background-color: #212529; }
-        .nav-link { color: #cfd8dc; margin-bottom: 5px; border-radius: 5px; }
-        .nav-link:hover, .nav-link.active { background-color: #0d6efd; color: white; }
-        .main-content { background-color: #f8f9fa; min-height: 100vh; }
-    </style>
 </head>
 <body>
-    <div class="d-flex flex-nowrap">
-        
-        <div class="sidebar d-flex flex-column flex-shrink-0 p-3 text-white" style="width: 250px;">
-            <a href="/Admin/Index" class="d-flex align-items-center mb-3 mb-md-0 me-md-auto text-white text-decoration-none">
-                <span class="fs-4 fw-bold">👟 Stepify Admin</span>
+    <div class="d-flex">
+        <!-- Sidebar -->
+        <aside class="admin-sidebar">
+            <!-- Brand -->
+            <a href="/Admin/Index" class="admin-brand text-decoration-none">
+                <i class="fa-solid fa-shoe-prints"></i>
+                <span>Stepify Admin</span>
             </a>
-            <hr>
-            <ul class="nav nav-pills flex-column mb-auto">
-                <li class="nav-item">
-                    <a asp-controller="Admin" asp-action="Index" class="nav-link @(ViewContext.RouteData.Values["Action"].ToString() == "Index" ? "active" : "")">
-                        📊 หน้าแรก (Dashboard)
-                    </a>
-                </li>
-                <li>
-                    <a asp-controller="Admin" asp-action="ManageUsers" class="nav-link @(ViewContext.RouteData.Values["Action"].ToString() == "ManageUsers" ? "active" : "")">
-                        👥 ระบบจัดการผู้ใช้งาน
-                    </a>
-                </li>
-                <li>
-                    <a asp-controller="Admin" asp-action="ManageProducts" class="nav-link @(ViewContext.RouteData.Values["Action"].ToString() == "ManageProducts" ? "active" : "")">
-                        📦 ระบบจัดการสินค้า
-                    </a>
-                </li>
-                <li>
-                    <a href="#" class="nav-link">
-                        🎟️ ระบบโปรโมชั่น (Coming soon)
-                    </a>
-                </li>
-                <li>
-                    <a href="#" class="nav-link">
-                        📄 รายงานยอดขาย (Coming soon)
-                    </a>
-                </li>
-            </ul>
-            <hr>
-            <div class="dropdown">
-                <a href="#" class="d-flex align-items-center text-white text-decoration-none dropdown-toggle" id="dropdownUser1" data-bs-toggle="dropdown" aria-expanded="false">
-                    <img src="https://ui-avatars.com/api/?name=Admin&background=0D8ABC&color=fff" alt="" width="32" height="32" class="rounded-circle me-2">
-                    <strong>Admin (ผู้ดูแลระบบ)</strong>
-                </a>
-                <ul class="dropdown-menu dropdown-menu-dark text-small shadow" aria-labelledby="dropdownUser1">
-                    <li><a class="dropdown-item" href="/">🌍 กลับไปหน้าร้านค้า</a></li>
-                    <li><hr class="dropdown-divider"></li>
-                    <li><a class="dropdown-item text-danger" href="/Auth/Login">🚪 ออกจากระบบ</a></li>
+            
+            <!-- Navigation -->
+            <nav class="admin-nav">
+                <ul class="nav flex-column">
+                    <li class="nav-item">
+                        <a asp-controller="Admin" asp-action="Index" 
+                           class="nav-link @(ViewContext.RouteData.Values["Action"]?.ToString() == "Index" ? "active" : "")">
+                            <i class="fa-solid fa-chart-line"></i>
+                            <span>Dashboard</span>
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a asp-controller="Admin" asp-action="ManageUsers" 
+                           class="nav-link @(ViewContext.RouteData.Values["Action"]?.ToString() == "ManageUsers" || ViewContext.RouteData.Values["Action"]?.ToString() == "EditUser" ? "active" : "")">
+                            <i class="fa-solid fa-users"></i>
+                            <span>จัดการผู้ใช้งาน</span>
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a asp-controller="Admin" asp-action="ManageProducts" 
+                           class="nav-link @(ViewContext.RouteData.Values["Action"]?.ToString() == "ManageProducts" ? "active" : "")">
+                            <i class="fa-solid fa-boxes-stacked"></i>
+                            <span>จัดการสินค้า</span>
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a href="#" class="nav-link disabled">
+                            <i class="fa-solid fa-tags"></i>
+                            <span>โปรโมชั่น</span>
+                            <small class="ms-auto badge bg-secondary">Soon</small>
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a href="#" class="nav-link disabled">
+                            <i class="fa-solid fa-chart-pie"></i>
+                            <span>รายงานยอดขาย</span>
+                            <small class="ms-auto badge bg-secondary">Soon</small>
+                        </a>
+                    </li>
                 </ul>
+            </nav>
+            
+            <!-- User Profile -->
+            <div class="admin-user">
+                <div class="dropdown">
+                    <button class="admin-user-btn dropdown-toggle" type="button" id="adminUserDropdown" data-bs-toggle="dropdown" aria-expanded="false">
+                        <img src="https://ui-avatars.com/api/?name=Admin&background=2979ff&color=fff&bold=true" 
+                             alt="Admin" class="admin-user-avatar">
+                        <div class="admin-user-info">
+                            <div class="admin-user-name">Administrator</div>
+                            <div class="admin-user-role">Super Admin</div>
+                        </div>
+                    </button>
+                    <ul class="dropdown-menu dropdown-menu-dark" aria-labelledby="adminUserDropdown">
+                        <li>
+                            <a class="dropdown-item" href="/">
+                                <i class="fa-solid fa-store me-2"></i> กลับไปหน้าร้านค้า
+                            </a>
+                        </li>
+                        <li><hr class="dropdown-divider"></li>
+                        <li>
+                            <a class="dropdown-item text-danger" href="/Auth/Logout">
+                                <i class="fa-solid fa-right-from-bracket me-2"></i> ออกจากระบบ
+                            </a>
+                        </li>
+                    </ul>
+                </div>
             </div>
-        </div>
+        </aside>
 
-        <div class="main-content flex-grow-1 p-4">
-            <main role="main">
-                @RenderBody()
-            </main>
-        </div>
-
+        <!-- Main Content -->
+        <main class="admin-main">
+            @RenderBody()
+        </main>
     </div>
 
     <script src="~/lib/jquery/dist/jquery.min.js"></script>
