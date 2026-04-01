@@ -7,7 +7,7 @@
 
 <!-- Header -->
 <div class="admin-header">
-    <<div class="d-flex justify-content-between align-items-center mb-4">
+    <div class="d-flex justify-content-between align-items-center mb-4">
         <h3 class="fw-bold"><i class="fa-solid fa-boxes-stacked text-primary"></i> จัดการสินค้า (Products)</h3>
     
         @if (User.IsInRole("Admin"))
@@ -122,14 +122,13 @@
                         <!-- Products Table -->
                         <div class="admin-table-wrapper">
                             <table class="table admin-table">
-                                <thead>
+                                <thead class="table-dark">
                                     <tr>
                                         <th style="width: 100px;" class="text-center">รูปภาพ</th>
                                         <th style="width: 80px;">รหัส</th>
                                         <th>ชื่อสินค้า</th>
                                         <th style="width: 120px;" class="text-center">แบรนด์</th>
                                         <th style="width: 130px;" class="text-end">ราคา</th>
-                                        <th>สถานะ</th>
                                         @if (User.IsInRole("Admin"))
                                         {
                                             <th class="text-center pe-4">จัดการ</th>
