@@ -1,0 +1,57 @@
+@model List<Stepify.Models.Db.Order>
+@{
+    Layout = "_Layout";
+    ViewData["Title"] = "ประวัติการสั่งซื้อ";
+}
+
+<div class="container mt-4 mb-5">
+    <h3 class="fw-bold mb-4"><i class="fa-solid fa-box text-primary"></i> ประวัติการสั่งซื้อของฉัน</h3>
+
+    @if (Model != null && Model.Any())
+    {
+        <div class="card border-0 shadow-sm">
+            <div class="card-body p-0">
+                <table class="table table-hover align-middle mb-0">
+                    <thead class="table-light">
+                        <tr>
+                            <th class="ps-4">หมายเลขบิล</th>
+                            <th>วันที่สั่งซื้อ</th>
+                            <th>ยอดสุทธิ</th>
+                            <th>สถานะการชำระเงิน</th>
+                            <th>สถานะพัสดุ</th>
+                            <th class="text-center pe-4">จัดการ</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach (var order in Model)
+                        {
+                            <tr>
+                                <td class="ps-4 fw-bold text-primary">#ORD-@order.OrderId</td>
+                                <td>@(order.OrderDate?.ToString("dd/MM/yyyy HH:mm"))</td>
+                                <td class="fw-bold text-success">@order.NetAmount.ToString("N2") ฿</td>
+                                <td>
+                                    @if(order.PaymentStatus == "Pending") { <span class="badge bg-warning text-dark">รอชำระเงิน</span> }
+                                    else { <span class="badge bg-success">@order.PaymentStatus</span> }
+                                </td>
+                                <td>
+                                    @if(order.ShippingStatus == "Packing") { <span class="badge bg-secondary">กำลังจัดเตรียม</span> }
+                                    else { <span class="badge bg-info">@order.ShippingStatus</span> }
+                                </td>
+                                <td class="text-center pe-4">
+                                    <a asp-action="Details" asp-route-id="@order.OrderId" class="btn btn-sm btn-outline-primary">ดูรายละเอียด</a>
+                                </td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    }
+    else
+    {
+        <div class="text-center py-5">
+            <h4 class="text-muted">คุณยังไม่มีประวัติการสั่งซื้อ</h4>
+            <a href="/" class="btn btn-primary mt-3">ไปเลือกซื้อสินค้ากันเลย!</a>
+        </div>
+    }
+</div>

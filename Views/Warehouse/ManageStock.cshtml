@@ -1,0 +1,60 @@
+@{
+    Layout = User.IsInRole("Admin") ? "_AdminLayout" : "_WarehouseLayout";
+    ViewData["Title"] = "จัดการคลังสินค้า";
+    var stockList = ViewBag.StockList as IEnumerable<dynamic>;
+}
+
+<div class="container-fluid mt-4 mb-5">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h3 class="fw-bold"><i class="fa-solid fa-boxes-stacked text-primary"></i> คลังสินค้า (Warehouse)</h3>
+    </div>
+
+    <div class="card border-0 shadow-sm">
+        <div class="card-body p-0">
+            <table class="table table-hover align-middle mb-0">
+                <thead class="table-dark">
+                    <tr>
+                        <th class="ps-4">รูปภาพ</th>
+                        <th>ชื่อสินค้า</th>
+                        <th>สี (Color)</th>
+                        <th class="text-center">ไซส์ (Size)</th>
+                        <th class="text-center">สต๊อกคงเหลือ</th>
+                        <th class="text-center pe-4" style="width: 250px;">อัปเดตสต๊อก</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @if (stockList != null && stockList.Any())
+                    {
+                        foreach (var item in stockList)
+                        {
+                            <tr>
+                                <td class="ps-4">
+                                    <img src="@item.ImageUrl" class="rounded" style="width: 50px; height: 50px; object-fit: cover;">
+                                </td>
+                                <td class="fw-bold">@item.Name</td>
+                                <td>@item.Color</td>
+                                <td class="text-center fw-bold text-primary fs-5">@item.Size</td>
+                                <td class="text-center">
+                                    @if(item.StockQty <= 0) { <span class="badge bg-danger fs-6">หมด (Out of Stock)</span> }
+                                    else if(item.StockQty < 5) { <span class="badge bg-warning text-dark fs-6">@item.StockQty (ใกล้หมด)</span> }
+                                    else { <span class="badge bg-success fs-6">@item.StockQty</span> }
+                                </td>
+                                <td class="pe-4">
+                                    <form asp-controller="Warehouse" asp-action="UpdateStock" method="post" class="d-flex gap-2">
+                                        <input type="hidden" name="VariantId" value="@item.VariantId" />
+                                        <input type="number" name="NewStockQty" class="form-control form-control-sm text-center" value="@item.StockQty" min="0" required>
+                                        <button type="submit" class="btn btn-sm btn-primary">บันทึก</button>
+                                    </form>
+                                </td>
+                            </tr>
+                        }
+                    }
+                    else
+                    {
+                        <tr><td colspan="6" class="text-center py-4 text-muted">ยังไม่มีข้อมูลสินค้าในคลัง</td></tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>

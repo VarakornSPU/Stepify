@@ -1,5 +1,7 @@
+@using System.Security.Claims
 <!DOCTYPE html>
 <html lang="th">
+
 <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
@@ -8,7 +10,9 @@
     <!-- Google Fonts -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Poppins:wght@600;700;800&display=swap" rel="stylesheet">
+    <link
+    href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Poppins:wght@600;700;800&display=swap"
+    rel="stylesheet">
     
     <!-- Stylesheets -->
     <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
@@ -19,6 +23,7 @@
     <link rel="stylesheet" href="~/css/admin.css" asp-append-version="true" />
     <link rel="stylesheet" href="~/css/components.css" asp-append-version="true" />
 </head>
+
 <body>
     <div class="d-flex">
         <!-- Sidebar -->
@@ -33,38 +38,62 @@
             <nav class="admin-nav">
                 <ul class="nav flex-column">
                     <li class="nav-item">
-                        <a asp-controller="Admin" asp-action="Index" 
-                           class="nav-link @(ViewContext.RouteData.Values["Action"]?.ToString() == "Index" ? "active" : "")">
+                        <a asp-controller="Admin" asp-action="Index"
+                               class="nav-link @(ViewContext.RouteData.Values["Action"]?.ToString() == "Index" ? "active" : "")">
                             <i class="fa-solid fa-chart-line"></i>
                             <span>Dashboard</span>
                         </a>
                     </li>
+                    
+                    @if (User.IsInRole("Admin"))
+                    {
+                        <li class="nav-item">
+                            <a asp-controller="Admin" asp-action="ManageUsers"
+                                   class="nav-link @(ViewContext.RouteData.Values["Action"]?.ToString() == "ManageUsers" || ViewContext.RouteData.Values["Action"]?.ToString() == "EditUser" ? "active" : "")">
+                                <i class="fa-solid fa-users"></i>
+                                <span>จัดการผู้ใช้งาน</span>
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a asp-controller="Admin" asp-action="ManageProducts"
+                                   class="nav-link @(ViewContext.RouteData.Values["Action"]?.ToString() == "ManageProducts" ? "active" : "")">
+                                <i class="fa-solid fa-boxes-stacked"></i>
+                                <span>จัดการสินค้า</span>
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a href="/Admin/ManageOrders"
+                                   class="nav-link @(ViewContext.RouteData.Values["Action"]?.ToString() == "ManageOrders" || ViewContext.RouteData.Values["Action"]?.ToString() == "OrderDetails" ? "active" : "")">
+                                <i class="fa-solid fa-clipboard-list"></i>
+                                <span>จัดการคำสั่งซื้อ</span>
+                            </a>
+                        </li>
+                    }
+
+                    @if (User.IsInRole("Admin") || User.IsInRole("Warehouse"))
+                    {
+                        <li class="nav-item">
+                            <a href="/Warehouse/ManageStock"
+                                   class="nav-link @(ViewContext.RouteData.Values["Controller"]?.ToString() == "Warehouse" ? "active" : "")">
+                                <i class="fa-solid fa-boxes-stacked"></i>
+                                <span>คลังสินค้า (Warehouse)</span>
+                            </a>
+                        </li>
+                    }
+
+                    
                     <li class="nav-item">
-                        <a asp-controller="Admin" asp-action="ManageUsers" 
-                           class="nav-link @(ViewContext.RouteData.Values["Action"]?.ToString() == "ManageUsers" || ViewContext.RouteData.Values["Action"]?.ToString() == "EditUser" ? "active" : "")">
-                            <i class="fa-solid fa-users"></i>
-                            <span>จัดการผู้ใช้งาน</span>
-                        </a>
-                    </li>
-                    <li class="nav-item">
-                        <a asp-controller="Admin" asp-action="ManageProducts" 
-                           class="nav-link @(ViewContext.RouteData.Values["Action"]?.ToString() == "ManageProducts" ? "active" : "")">
-                            <i class="fa-solid fa-boxes-stacked"></i>
-                            <span>จัดการสินค้า</span>
-                        </a>
-                    </li>
-                    <li class="nav-item">
-                        <a href="#" class="nav-link disabled">
+                        <a asp-controller="Admin" asp-action="ManagePromotions"
+                               class="nav-link @(ViewContext.RouteData.Values["Action"]?.ToString() == "ManagePromotions" ? "active" : "")">
                             <i class="fa-solid fa-tags"></i>
-                            <span>โปรโมชั่น</span>
-                            <small class="ms-auto badge bg-secondary">Soon</small>
+                            <span>จัดการโปรโมชั่น</span>
                         </a>
                     </li>
                     <li class="nav-item">
-                        <a href="#" class="nav-link disabled">
+                        <a asp-controller="Admin" asp-action="SalesReport"
+                               class="nav-link @(ViewContext.RouteData.Values["Action"]?.ToString() == "SalesReport" ? "active" : "")">
                             <i class="fa-solid fa-chart-pie"></i>
                             <span>รายงานยอดขาย</span>
-                            <small class="ms-auto badge bg-secondary">Soon</small>
                         </a>
                     </li>
                 </ul>
@@ -73,13 +102,17 @@
             <!-- User Profile -->
             <div class="admin-user">
                 <div class="dropdown">
-                    <button class="admin-user-btn dropdown-toggle" type="button" id="adminUserDropdown" data-bs-toggle="dropdown" aria-expanded="false">
-                        <img src="https://ui-avatars.com/api/?name=Admin&background=2979ff&color=fff&bold=true" 
-                             alt="Admin" class="admin-user-avatar">
+                    <button class="admin-user-btn dropdown-toggle" type="button" id="adminUserDropdown"
+                            data-bs-toggle="dropdown" aria-expanded="false">
+                        
+                        <img src="https://ui-avatars.com/api/?name=@User.Identity.Name&background=2979ff&color=fff&bold=true"
+                             alt="Profile" class="admin-user-avatar">
+                             
                         <div class="admin-user-info">
-                            <div class="admin-user-name">Administrator</div>
-                            <div class="admin-user-role">Super Admin</div>
+                            <div class="admin-user-name">@User.Identity.Name</div>
+                            <div class="admin-user-role">@User.FindFirst(ClaimTypes.Role)?.Value</div>
                         </div>
+
                     </button>
                     <ul class="dropdown-menu dropdown-menu-dark" aria-labelledby="adminUserDropdown">
                         <li>
@@ -87,7 +120,9 @@
                                 <i class="fa-solid fa-store me-2"></i> กลับไปหน้าร้านค้า
                             </a>
                         </li>
-                        <li><hr class="dropdown-divider"></li>
+                        <li>
+                            <hr class="dropdown-divider">
+                        </li>
                         <li>
                             <a class="dropdown-item text-danger" href="/Auth/Logout">
                                 <i class="fa-solid fa-right-from-bracket me-2"></i> ออกจากระบบ
@@ -108,4 +143,5 @@
     <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
     @await RenderSectionAsync("Scripts", required: false)
 </body>
+
 </html>

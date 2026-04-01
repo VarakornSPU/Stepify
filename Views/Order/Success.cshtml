@@ -1,0 +1,23 @@
+@{
+    Layout = "_Layout";
+    ViewData["Title"] = "สั่งซื้อสำเร็จ";
+}
+
+<div class="container text-center py-5 mt-5">
+    <div class="mb-4">
+        <i class="fa-solid fa-circle-check text-success" style="font-size: 6rem;"></i>
+    </div>
+    <h1 class="display-5 fw-bold text-dark mb-3">สั่งซื้อสินค้าสำเร็จ!</h1>
+    <p class="lead text-muted">ขอบคุณที่เลือกช้อปกับ Stepify</p>
+    
+    <div class="card shadow-sm mx-auto my-4" style="max-width: 400px; border-radius: 15px;">
+        <div class="card-body py-4">
+            <h5 class="text-muted mb-2">หมายเลขคำสั่งซื้อของคุณคือ</h5>
+            <h2 class="fw-bold text-primary">#ORD-@ViewBag.OrderId</h2>
+        </div>
+    </div>
+
+    <p class="text-muted mb-5">เราได้ส่งอีเมลยืนยันคำสั่งซื้อไปให้คุณแล้ว คุณสามารถตรวจสอบสถานะการจัดส่งได้ที่เมนู "ประวัติการสั่งซื้อ"</p>
+
+    <a href="/" class="btn btn-primary btn-lg px-5">กลับสู่หน้าแรก</a>
+</div>

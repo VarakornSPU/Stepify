@@ -1,0 +1,57 @@
+@model List<Stepify.Models.Db.Order>
+@{
+    Layout = User.IsInRole("Admin") ? "_AdminLayout" : "_WarehouseLayout";
+    ViewData["Title"] = "จัดการคำสั่งซื้อ";
+}
+
+<div class="container-fluid mt-4 mb-5">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h3 class="fw-bold"><i class="fa-solid fa-clipboard-list text-primary"></i> จัดการคำสั่งซื้อ (Orders)</h3>
+    </div>
+
+    <div class="card border-0 shadow-sm">
+        <div class="card-body p-0">
+            <table class="table table-hover align-middle mb-0">
+                <thead class="table-dark">
+                    <tr>
+                        <th class="ps-4">รหัสบิล</th>
+                        <th>วันที่สั่งซื้อ</th>
+                        <th>ยอดสุทธิ</th>
+                        <th>สถานะการเงิน</th>
+                        <th>สถานะจัดส่ง</th>
+                        <th class="text-center pe-4">จัดการ</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @if (Model != null && Model.Any())
+                    {
+                        foreach (var order in Model)
+                        {
+                            <tr>
+                                <td class="ps-4 fw-bold text-primary">#ORD-@order.OrderId</td>
+                                <td>@(order.OrderDate?.ToString("dd/MM/yyyy HH:mm"))</td>
+                                <td class="fw-bold text-success">@order.NetAmount.ToString("N2") ฿</td>
+                                <td>
+                                    @if(order.PaymentStatus == "Paid") { <span class="badge bg-success">Paid</span> }
+                                    else { <span class="badge bg-warning text-dark">@order.PaymentStatus</span> }
+                                </td>
+                                <td>
+                                    @if(order.ShippingStatus == "Shipped") { <span class="badge bg-info">Shipped</span> }
+                                    else if(order.ShippingStatus == "Delivered") { <span class="badge bg-success">Delivered</span> }
+                                    else { <span class="badge bg-secondary">@order.ShippingStatus</span> }
+                                </td>
+                                <td class="text-center pe-4">
+                                    <a asp-action="OrderDetails" asp-route-id="@order.OrderId" class="btn btn-sm btn-primary">จัดการ</a>
+                                </td>
+                            </tr>
+                        }
+                    }
+                    else
+                    {
+                        <tr><td colspan="6" class="text-center py-4 text-muted">ยังไม่มีคำสั่งซื้อในระบบ</td></tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>

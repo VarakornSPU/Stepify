@@ -1,0 +1,138 @@
+@model Stepify.Models.Db.Product
+@{
+    Layout = "_AdminLayout";
+    ViewData["Title"] = "แก้ไขสินค้า";
+    var images = ViewBag.Images as List<Stepify.Models.Db.ProductImage>;
+    var variants = ViewBag.Variants as List<Stepify.Models.Db.ProductVariant>;
+}
+
+<div class="container mt-4 mb-5">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h3 class="fw-bold"><i class="fa-solid fa-pen-to-square text-warning"></i> แก้ไขข้อมูลสินค้า</h3>
+        <a asp-action="ManageProducts" class="btn btn-outline-secondary">กลับหน้ารายการ</a>
+    </div>
+
+    <form asp-action="EditProduct" method="post" enctype="multipart/form-data" class="card border-0 shadow-sm p-4">
+        <input type="hidden" asp-for="ProductId" />
+
+        <div class="row">
+            <div class="col-md-8 mb-3">
+                <label class="form-label fw-bold">ชื่อสินค้า</label>
+                <input type="text" asp-for="Name" class="form-control" required>
+            </div>
+            <div class="col-md-4 mb-3">
+                <label class="form-label fw-bold">แบรนด์</label>
+                <input type="text" asp-for="Brand" class="form-control" required>
+            </div>
+        </div>
+
+        <div class="mb-3">
+            <label class="form-label fw-bold">รายละเอียดสินค้า</label>
+            <textarea asp-for="Description" class="form-control" rows="4"></textarea>
+        </div>
+
+        <div class="row">
+            <div class="col-md-6 mb-3">
+                <label class="form-label fw-bold">ราคาขาย (บาท)</label>
+                <input type="number" step="0.01" asp-for="Price" class="form-control text-success fw-bold" required>
+            </div>
+            <div class="col-md-6 mb-3">
+                <label class="form-label fw-bold">อัปโหลดรูปภาพเพิ่ม (เลือกได้หลายรูป)</label>
+                <input type="file" name="ImageFiles" class="form-control" accept="image/*" multiple>
+            </div>
+        </div>
+
+        @if(images != null && images.Any())
+        {
+            <div class="mb-4">
+                <label class="form-label fw-bold text-muted">รูปภาพปัจจุบัน:</label>
+                <div class="d-flex gap-2 flex-wrap">
+                    @foreach (var img in images)
+                    {
+                        <div class="position-relative">
+                            <img src="@img.ImageUrl" class="img-thumbnail" style="width: 80px; height: 80px; object-fit: cover;">
+                            @if(img.IsPrimary == true) { <span class="badge bg-danger position-absolute top-0 start-0">หน้าปก</span> }
+                        </div>
+                    }
+                </div>
+            </div>
+        }
+
+        <hr class="my-4">
+
+        <div class="d-flex justify-content-between align-items-center mb-3">
+            <h5 class="fw-bold text-primary mb-0"><i class="fa-solid fa-boxes-stacked"></i> จัดการไซส์และสต๊อก</h5>
+            <button type="button" class="btn btn-sm btn-outline-primary" id="addVariantBtn">+ เพิ่มไซส์อื่น</button>
+        </div>
+
+        <div id="variantsContainer">
+            @if(variants != null && variants.Any())
+            {
+                foreach(var v in variants)
+                {
+                    <div class="row bg-light p-2 rounded-3 mb-2 variant-row border">
+                        <input type="hidden" name="VariantIds" value="@v.VariantId" class="v-id" />
+                        <div class="col-md-4 mb-2 mb-md-0">
+                            <label class="form-label fw-semibold" style="font-size: 0.85rem;">ไซส์</label>
+                            <input type="text" class="form-control form-control-sm" name="Sizes" value="@v.Size" required>
+                        </div>
+                        <div class="col-md-4 mb-2 mb-md-0">
+                            <label class="form-label fw-semibold" style="font-size: 0.85rem;">สี</label>
+                            <input type="text" class="form-control form-control-sm" name="Colors" value="@v.Color" required>
+                        </div>
+                        <div class="col-md-4 mb-2 mb-md-0">
+                            <label class="form-label fw-semibold" style="font-size: 0.85rem;">จำนวนสต๊อก</label>
+                            <input type="number" class="form-control form-control-sm" name="StockQtys" value="@v.StockQty" min="0" required>
+                        </div>
+                    </div>
+                }
+            }
+        </div>
+        <small class="text-muted mb-4 d-block">* หากต้องการซ่อนไซส์ใด ให้ปรับสต๊อกเป็น 0 ระบบจะขึ้นว่า Out of Stock อัตโนมัติ</small>
+
+        <div class="text-end">
+            <button type="submit" class="btn btn-warning btn-lg px-5 text-dark fw-bold">บันทึกการเปลี่ยนแปลง</button>
+        </div>
+    </form>
+</div>
+
+@section Scripts {
+    <script>
+        document.getElementById('addVariantBtn').addEventListener('click', function () {
+            var container = document.getElementById('variantsContainer');
+            
+            // สร้างโครงสร้าง HTML สำหรับแถวใหม่เตรียมไว้เลย
+            // สังเกตว่า VariantIds = 0 เพื่อบอกระบบหลังบ้านว่านี่คือไซส์ใหม่
+            var newRowHtml = `
+                <div class="row bg-light p-2 rounded-3 mb-2 variant-row border position-relative">
+                    <input type="hidden" name="VariantIds" value="0" class="v-id" />
+                    <div class="col-md-3 mb-2 mb-md-0">
+                        <label class="form-label fw-semibold" style="font-size: 0.85rem;">ไซส์</label>
+                        <input type="text" class="form-control form-control-sm" name="Sizes" required>
+                    </div>
+                    <div class="col-md-3 mb-2 mb-md-0">
+                        <label class="form-label fw-semibold" style="font-size: 0.85rem;">สี</label>
+                        <input type="text" class="form-control form-control-sm" name="Colors" required>
+                    </div>
+                    <div class="col-md-4 mb-2 mb-md-0">
+                        <label class="form-label fw-semibold" style="font-size: 0.85rem;">จำนวนสต๊อก</label>
+                        <input type="number" class="form-control form-control-sm" name="StockQtys" value="1" min="1" required>
+                    </div>
+                    <div class="col-md-2 d-flex align-items-end pb-1">
+                        <button type="button" class="btn btn-sm btn-danger w-100 remove-variant"><i class="fa-solid fa-trash"></i> ลบ</button>
+                    </div>
+                </div>
+            `;
+
+            // เอา HTML ใหม่ไปต่อท้ายในกล่อง
+            container.insertAdjacentHTML('beforeend', newRowHtml);
+
+            // ทำให้ปุ่ม "ลบ" ของแถวใหม่นี้กดลบตัวเองทิ้งได้
+            var removeBtns = container.querySelectorAll('.remove-variant');
+            var lastBtn = removeBtns[removeBtns.length - 1]; // เลือกปุ่มลบอันล่าสุดที่เพิ่งสร้าง
+            lastBtn.addEventListener('click', function() {
+                this.closest('.variant-row').remove(); // กดแล้วลบแถวของตัวเองทิ้ง
+            });
+        });
+    </script>
+}

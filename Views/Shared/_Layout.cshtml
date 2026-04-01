@@ -1,5 +1,6 @@
 ﻿<!DOCTYPE html>
 <html lang="th">
+
 <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
@@ -8,7 +9,9 @@
     <!-- Google Fonts -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Poppins:wght@600;700;800&display=swap" rel="stylesheet">
+    <link
+    href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Poppins:wght@600;700;800&display=swap"
+    rel="stylesheet">
     
     <!-- Stylesheets -->
     <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
@@ -22,6 +25,7 @@
     <link rel="stylesheet" href="~/css/components.css" asp-append-version="true" />
     <link rel="stylesheet" href="~/css/footer.css" asp-append-version="true" />
 </head>
+
 <body>
     <header>
         <nav class="navbar navbar-expand-lg navbar-stepify sticky-top">
@@ -53,8 +57,10 @@
                     </ul>
 
                     <!-- Search Form -->
-                    <form class="search-form-wrapper d-flex me-3" asp-controller="Home" asp-action="Search" method="get">
-                        <input class="form-control" type="search" name="keyword" placeholder="ค้นหารองเท้า..." aria-label="Search">
+                    <form class="search-form-wrapper d-flex me-3" asp-controller="Home" asp-action="Search"
+                          method="get">
+                        <input class="form-control" type="search" name="keyword" placeholder="ค้นหารองเท้า..."
+                               aria-label="Search">
                         <button class="btn btn-search" type="submit">
                             <i class="fa-solid fa-magnifying-glass"></i>
                         </button>
@@ -74,28 +80,50 @@
                         {
                             <!-- User Dropdown -->
                             <li class="nav-item dropdown user-dropdown">
-                                <a class="nav-link dropdown-toggle" href="#" id="userDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                                <a class="nav-link dropdown-toggle" href="#" id="userDropdown" role="button"
+                                       data-bs-toggle="dropdown" aria-expanded="false">
                                     <i class="fa-solid fa-circle-user me-1"></i>
                                     @User.Identity.Name
                                 </a>
                                 <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="userDropdown">
+                                    <li>
+                                        <a class="dropdown-item" asp-controller="Order" asp-action="History">
+                                            <i class="fa-solid fa-box-open me-2"></i> ประวัติการสั่งซื้อ
+                                        </a>
+                                    </li>
+
                                     @if (User.IsInRole("Admin"))
                                     {
                                         <li>
-                                            <a class="dropdown-item" asp-controller="Admin" asp-action="Index">
-                                                <i class="fa-solid fa-gauge text-primary"></i> ไปหน้า Admin
+                                            <hr class="dropdown-divider">
+                                        </li>
+                                        <li>
+                                            <a class="dropdown-item fw-bold text-primary" asp-controller="Admin"
+                                                   asp-action="Index">
+                                                <i class="fa-solid fa-gauge-high me-2"></i> จัดการระบบ (Admin)
                                             </a>
                                         </li>
-                                        <li><hr class="dropdown-divider"></li>
                                     }
+    
+                                    @if (User.IsInRole("Warehouse"))
+                                    {
+                                        <li>
+                                            <hr class="dropdown-divider">
+                                        </li>
+                                        <li>
+                                            <a class="dropdown-item fw-bold text-success" asp-controller="Warehouse"
+                                                   asp-action="ManageStock">
+                                                <i class="fa-solid fa-boxes-stacked me-2"></i> จัดการคลังสินค้า
+                                            </a>
+                                        </li>
+                                    }
+
                                     <li>
-                                        <a class="dropdown-item" href="#">
-                                            <i class="fa-solid fa-box-open text-secondary"></i> ประวัติการสั่งซื้อ
-                                        </a>
+                                        <hr class="dropdown-divider">
                                     </li>
                                     <li>
                                         <a class="dropdown-item text-danger" asp-controller="Auth" asp-action="Logout">
-                                            <i class="fa-solid fa-right-from-bracket"></i> ออกจากระบบ
+                                            <i class="fa-solid fa-right-from-bracket me-2"></i> ออกจากระบบ
                                         </a>
                                     </li>
                                 </ul>
@@ -151,4 +179,5 @@
     <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
     @await RenderSectionAsync("Scripts", required: false)
 </body>
+
 </html>

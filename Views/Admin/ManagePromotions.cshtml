@@ -1,0 +1,103 @@
+@model List<Stepify.Models.Db.Promotion>
+@{
+    Layout = "_AdminLayout";
+    ViewData["Title"] = "จัดการโปรโมชั่น";
+}
+
+<div class="container-fluid mt-4 mb-5">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h3 class="fw-bold"><i class="fa-solid fa-tags text-danger"></i> จัดการโปรโมชั่นและส่วนลด</h3>
+        <button class="btn btn-danger" data-bs-toggle="modal" data-bs-target="#addPromoModal">
+            <i class="fa-solid fa-plus"></i> สร้างโค้ดส่วนลด
+        </button>
+    </div>
+
+    <div class="card border-0 shadow-sm">
+        <div class="card-body p-0">
+            <table class="table table-hover align-middle mb-0">
+                <thead class="table-dark">
+                    <tr>
+                        <th class="ps-4">โค้ดส่วนลด (Code)</th>
+                        <th class="text-center">มูลค่าส่วนลด</th>
+                        <th class="text-center">ประเภท</th>
+                        <th class="text-center">สถานะใช้งาน</th>
+                        <th class="text-center pe-4">จัดการ</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @if (Model != null && Model.Any())
+                    {
+                        foreach (var item in Model)
+                        {
+                            <tr>
+                                <td class="ps-4">
+                                    <span class="badge bg-light text-danger border border-danger fs-6 tracking-widest">@item.ConditionValue</span>
+                                </td>
+                                <td class="text-center text-success fw-bold">
+                                    @item.DiscountValue
+                                </td>
+                                <td class="text-center">
+                                    @(item.IsPercent == true ? "ลดเป็นเปอร์เซ็นต์ (%)" : "ลดเป็นเงินสด (บาท)")
+                                </td>
+                                <td class="text-center">
+                                    @if(item.IsActive == true) { 
+                                        <span class="badge bg-success"><i class="fa-solid fa-circle-check"></i> ใช้งานอยู่</span> 
+                                    } else { 
+                                        <span class="badge bg-secondary"><i class="fa-solid fa-circle-xmark"></i> ปิดใช้งาน</span> 
+                                    }
+                                </td>
+                                <td class="text-center pe-4">
+                                    <a asp-action="TogglePromotion" asp-route-id="@item.PromotionId" class="btn btn-sm @(item.IsActive == true ? "btn-warning" : "btn-success")">
+                                        @(item.IsActive == true ? "ปิดใช้งาน" : "เปิดใช้งาน")
+                                    </a>
+                                    <a asp-action="DeletePromotion" asp-route-id="@item.PromotionId" class="btn btn-sm btn-outline-danger" onclick="return confirm('ยืนยันการลบโค้ดนี้?');">ลบ</a>
+                                </td>
+                            </tr>
+                        }
+                    }
+                    else
+                    {
+                        <tr><td colspan="5" class="text-center py-4 text-muted">ยังไม่มีโปรโมชั่นในระบบ</td></tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
+<div class="modal fade" id="addPromoModal" tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content border-0 shadow">
+            <div class="modal-header bg-danger text-white">
+                <h5 class="modal-title fw-bold"><i class="fa-solid fa-ticket"></i> สร้างโค้ดส่วนลดใหม่</h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+            </div>
+            <form asp-action="AddPromotion" method="post">
+                <div class="modal-body">
+                    <div class="mb-3">
+                        <label class="form-label fw-bold text-danger">รหัสโค้ดส่วนลด (Code)</label>
+                        <input type="text" name="ConditionValue" class="form-control text-uppercase fw-bold" placeholder="เช่น NEWYEAR50" required />
+                    </div>
+                    <div class="row">
+                        <div class="col-6 mb-3">
+                            <label class="form-label fw-bold">ประเภทส่วนลด</label>
+                            <select name="IsPercent" class="form-select" required>
+                                <option value="true">ลดเป็น %</option>
+                                <option value="false">ลดเป็นบาท</option>
+                            </select>
+                        </div>
+                        <div class="col-6 mb-3">
+                            <label class="form-label fw-bold">มูลค่าที่ลด</label>
+                            <input type="number" name="DiscountValue" class="form-control" step="0.01" min="1" placeholder="เช่น 50" required />
+                        </div>
+                    </div>
+                    <small class="text-muted">* โค้ดที่สร้างใหม่จะถูกเปิดใช้งานทันทีอัตโนมัติ</small>
+                </div>
+                <div class="modal-footer bg-light">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">ยกเลิก</button>
+                    <button type="submit" class="btn btn-danger fw-bold">บันทึกโค้ดส่วนลด</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>

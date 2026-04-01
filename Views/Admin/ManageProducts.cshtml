@@ -1,15 +1,22 @@
 @{
-    Layout = "_AdminLayout";
+    // 🌟 พระเอกอยู่บรรทัดนี้ครับ: ถ้าเป็น Admin ให้ใช้ Sidebar แอดมิน ถ้าไม่ใช่ให้ใช้ Sidebar คลังสินค้า
+    Layout = User.IsInRole("Admin") ? "_AdminLayout" : "_WarehouseLayout";
     ViewData["Title"] = "Manage Products";
     var products = ViewBag.Products as IEnumerable<dynamic>;
 }
 
 <!-- Header -->
 <div class="admin-header">
-    <h1><i class="fa-solid fa-boxes-stacked me-2 text-success"></i>จัดการสินค้า</h1>
-    <button type="button" class="btn btn-stepify-success" data-bs-toggle="modal" data-bs-target="#addProductModal">
-        <i class="fa-solid fa-plus me-2"></i>เพิ่มสินค้าใหม่
-    </button>
+    <<div class="d-flex justify-content-between align-items-center mb-4">
+        <h3 class="fw-bold"><i class="fa-solid fa-boxes-stacked text-primary"></i> จัดการสินค้า (Products)</h3>
+    
+        @if (User.IsInRole("Admin"))
+        {
+            <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#addProductModal">
+                <i class="fa-solid fa-plus"></i> เพิ่มสินค้าใหม่
+            </button>
+        }
+    </div>
 </div>
 
 <!-- Add Product Modal -->
@@ -27,17 +34,20 @@
                     <div class="row">
                         <div class="col-md-8 mb-3">
                             <label class="form-label fw-semibold">ชื่อรุ่นรองเท้า</label>
-                            <input type="text" class="form-control" name="Name" placeholder="เช่น Nike Air Max 90" required>
+                            <input type="text" class="form-control" name="Name" placeholder="เช่น Nike Air Max 90"
+                                   required>
                         </div>
                         <div class="col-md-4 mb-3">
                             <label class="form-label fw-semibold">แบรนด์</label>
-                            <input type="text" class="form-control" name="Brand" placeholder="เช่น Nike, Adidas" required>
+                            <input type="text" class="form-control" name="Brand" placeholder="เช่น Nike, Adidas"
+                                   required>
                         </div>
                     </div>
                     
                     <div class="mb-3">
                         <label class="form-label fw-semibold">รายละเอียดสินค้า</label>
-                        <textarea class="form-control" name="Description" rows="3" placeholder="อธิบายคุณสมบัติและจุดเด่นของสินค้า..."></textarea>
+                        <textarea class="form-control" name="Description" rows="3"
+                                  placeholder="อธิบายคุณสมบัติและจุดเด่นของสินค้า..."></textarea>
                     </div>
 
                     <div class="row">
@@ -45,86 +55,162 @@
                             <label class="form-label fw-semibold">ราคาขาย (บาท)</label>
                             <div class="input-group">
                                 <span class="input-group-text"><i class="fa-solid fa-tag"></i></span>
-                                <input type="number" step="0.01" class="form-control" name="Price" placeholder="0.00" required>
+                                <input type="number" step="0.01" class="form-control" name="Price" placeholder="0.00"
+                                       required>
                                 <span class="input-group-text">THB</span>
                             </div>
                         </div>
-                        <div class="col-md-6 mb-3">
-                            <label class="form-label fw-semibold">รูปภาพสินค้า</label>
-                            <input type="file" class="form-control" name="ImageFile" accept="image/*" required>
-                        </div>
-                    </div>
-                </div>
-                <div class="modal-footer">
-                    <button type="button" class="btn btn-stepify-outline" data-bs-dismiss="modal">ยกเลิก</button>
-                    <button type="submit" class="btn btn-stepify-success">
-                        <i class="fa-solid fa-check me-1"></i>บันทึกสินค้า
-                    </button>
-                </div>
-            </form>
-        </div>
-    </div>
-</div>
 
-<!-- Products Table -->
-<div class="admin-table-wrapper">
-    <table class="table admin-table">
-        <thead>
-            <tr>
-                <th style="width: 100px;" class="text-center">รูปภาพ</th>
-                <th style="width: 80px;">รหัส</th>
-                <th>ชื่อสินค้า</th>
-                <th style="width: 120px;" class="text-center">แบรนด์</th>
-                <th style="width: 130px;" class="text-end">ราคา</th>
-                <th style="width: 150px;" class="text-center">จัดการ</th>
-            </tr>
-        </thead>
-        <tbody>
-            @if (products != null && products.Any())
-            {
-                @foreach (var item in products)
-                {
-                    <tr>
-                        <td class="text-center">
-                            <img src="@item.ImageUrl" alt="@item.Name" class="product-img">
-                        </td>
-                        <td class="fw-semibold text-muted">#@item.ProductId</td>
-                        <td>
-                            <span class="fw-semibold">@item.Name</span>
-                        </td>
-                        <td class="text-center">
-                            <span class="badge badge-role badge-user">@item.Brand</span>
-                        </td>
-                        <td class="text-end">
-                            <span class="fw-bold" style="color: var(--accent-coral);">@item.Price.ToString("N0") THB</span>
-                        </td>
-                        <td class="text-center">
-                            <div class="d-flex justify-content-center gap-2">
-                                <button class="btn btn-action btn-action-edit" disabled title="Coming Soon">
-                                    <i class="fa-solid fa-pen-to-square"></i>
-                                </button>
-                                <a asp-route-id="@item.ProductId" asp-action="DeleteProduct" asp-controller="Admin" 
-                                   class="btn btn-action btn-action-delete"
-                                   onclick="return confirm('คุณแน่ใจหรือไม่ว่าต้องการลบสินค้านี้?');">
-                                    <i class="fa-solid fa-trash">ลบ</i>
-                                </a>
+                        <hr class="my-4">
+                        <div class="d-flex justify-content-between align-items-center mb-2">
+                            <h6 class="fw-bold text-primary mb-0"><i class="fa-solid fa-shoe-prints"></i>
+                                จัดการไซส์และสต๊อกสินค้า</h6>
+                                <button type="button" class="btn btn-sm btn-outline-primary" id="addVariantBtn">+
+                                    เพิ่มไซส์อื่น</button>
+                                </div>
+                    
+                                <div id="variantsContainer">
+                                    <div class="row bg-light p-2 rounded-3 mb-2 variant-row border">
+                                        <div class="col-md-4 mb-2 mb-md-0">
+                                            <label class="form-label fw-semibold" style="font-size: 0.85rem;">ไซส์
+                                                (Size)</label>
+                                                <input type="text" class="form-control form-control-sm" name="Sizes"
+                                                       placeholder="เช่น 40" required>
+                                            </div>
+                                            <div class="col-md-4 mb-2 mb-md-0">
+                                                <label class="form-label fw-semibold" style="font-size: 0.85rem;">สี (Color)</label>
+                                                <input type="text" class="form-control form-control-sm" name="Colors"
+                                                       placeholder="เช่น Black" required>
+                                            </div>
+                                            <div class="col-md-3 mb-2 mb-md-0">
+                                                <label class="form-label fw-semibold" style="font-size: 0.85rem;">จำนวน
+                                                    (คู่)</label>
+                                                    <input type="number" class="form-control form-control-sm" name="StockQtys" value="1"
+                                                           min="1" required>
+                                                </div>
+                                                <div class="col-md-1 d-flex align-items-end pb-1">
+                                                    <button type="button" class="btn btn-sm btn-danger w-100 remove-variant" disabled><i
+                                                        class="fa-solid fa-trash"></i></button>
+                                                    </div>
+                                                </div>
+                                            </div>
+
+                                            <hr class="my-4">
+
+                                            <div class="col-md-6 mb-3">
+                                                <label class="form-label fw-semibold">รูปภาพสินค้า <small
+                                                    class="text-danger">(เลือกได้หลายรูป)</small></label>
+                                                    <input type="file" class="form-control" name="ImageFiles" accept="image/*" multiple
+                                                           required>
+                                                    <div class="form-text mt-1" style="font-size: 0.8rem;">
+                                                        * รูปแรกที่คุณเลือกจะถูกตั้งเป็นรูปหน้าปกโดยอัตโนมัติ
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="modal-footer">
+                                            <button type="button" class="btn btn-stepify-outline" data-bs-dismiss="modal">ยกเลิก</button>
+                                            <button type="submit" class="btn btn-stepify-success">
+                                                <i class="fa-solid fa-check me-1"></i>บันทึกสินค้า
+                                            </button>
+                                        </div>
+                                    </form>
+                                </div>
                             </div>
-                        </td>
-                    </tr>
-                }
-            }
-            else
-            {
-                <tr>
-                    <td colspan="6">
-                        <div class="empty-state py-5">
-                            <i class="fa-solid fa-box-open empty-state-icon"></i>
-                            <h3 class="empty-state-title">ยังไม่มีสินค้าในระบบ</h3>
-                            <p class="empty-state-text">เริ่มต้นโดยการเพิ่มสินค้าใหม่</p>
                         </div>
-                    </td>
-                </tr>
-            }
-        </tbody>
-    </table>
-</div>
+
+                        <!-- Products Table -->
+                        <div class="admin-table-wrapper">
+                            <table class="table admin-table">
+                                <thead>
+                                    <tr>
+                                        <th style="width: 100px;" class="text-center">รูปภาพ</th>
+                                        <th style="width: 80px;">รหัส</th>
+                                        <th>ชื่อสินค้า</th>
+                                        <th style="width: 120px;" class="text-center">แบรนด์</th>
+                                        <th style="width: 130px;" class="text-end">ราคา</th>
+                                        <th>สถานะ</th>
+                                        @if (User.IsInRole("Admin"))
+                                        {
+                                            <th class="text-center pe-4">จัดการ</th>
+                                        }
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    @if (products != null && products.Any())
+                                    {
+                                        @foreach (var item in products)
+                                        {
+                                            <tr>
+                                                <td class="text-center">
+                                                    <img src="@item.ImageUrl" alt="@item.Name" class="product-img">
+                                                </td>
+                                                <td class="fw-semibold text-muted">#@item.ProductId</td>
+                                                <td>
+                                                    <span class="fw-semibold">@item.Name</span>
+                                                </td>
+                                                <td class="text-center">
+                                                    <span class="badge badge-role badge-user">@item.Brand</span>
+                                                </td>
+                                                <td class="text-end">
+                                                    <span class="fw-bold" style="color: var(--accent-coral);">@item.Price.ToString("N0") THB</span>
+                                                </td>
+                                                @if (User.IsInRole("Admin"))
+                                                {
+                                                    <td class="text-center">
+                                                        <div class="d-flex justify-content-center gap-2">
+                                                            <a asp-action="EditProduct" asp-route-id="@item.ProductId"
+                                                               class="btn btn-sm btn-outline-warning">แก้ไข</a>
+                                                            <a asp-route-id="@item.ProductId" asp-action="DeleteProduct" asp-controller="Admin"
+                                                                   class="btn btn-action btn-action-delete"
+                                                                   onclick="return confirm('คุณแน่ใจหรือไม่ว่าต้องการลบสินค้านี้?');">
+                                                                <i class="fa-solid fa-trash">ลบ</i>
+                                                            </a>
+                                                        </div>
+                                                    </td>
+                                                }
+                                            </tr>
+                                        }
+                                    }
+                                    else
+                                    {
+                                        <tr>
+                                            <td colspan="6">
+                                                <div class="empty-state py-5">
+                                                    <i class="fa-solid fa-box-open empty-state-icon"></i>
+                                                    <h3 class="empty-state-title">ยังไม่มีสินค้าในระบบ</h3>
+                                                    <p class="empty-state-text">เริ่มต้นโดยการเพิ่มสินค้าใหม่</p>
+                                                </div>
+                                            </td>
+                                        </tr>
+                                    }
+                                </tbody>
+                            </table>
+                        </div>
+
+                        @section Scripts {
+                            <script>
+                                // โค้ดสำหรับกดเพิ่มแถวกรอกไซส์รองเท้า
+                                document.getElementById('addVariantBtn').addEventListener('click', function () {
+                                    var container = document.getElementById('variantsContainer');
+                                    var firstRow = container.querySelector('.variant-row');
+            
+                                    // โคลน (Copy) แถวแรกมา
+                                    var newRow = firstRow.cloneNode(true);
+            
+                                    // เคลียร์ค่าที่พิมพ์ค้างไว้ให้เป็นค่าว่าง
+                                    newRow.querySelectorAll('input[type="text"]').forEach(input => input.value = '');
+                                    newRow.querySelector('input[type="number"]').value = '1';
+            
+                                    // ปลดล็อคปุ่มถังขยะ ให้แถวที่โคลนมากดลบได้
+                                    var removeBtn = newRow.querySelector('.remove-variant');
+                                    removeBtn.disabled = false;
+                                    removeBtn.addEventListener('click', function () {
+                                        newRow.remove(); // กดปุ่มถังขยะแล้วลบแถวทิ้ง
+                                    });
+            
+                                    // เอาแถวใหม่ไปต่อท้ายในกล่อง
+                                    container.appendChild(newRow);
+                                });
+                            </script>
+                        }

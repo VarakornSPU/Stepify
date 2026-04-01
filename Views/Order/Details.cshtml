@@ -1,0 +1,84 @@
+@model Stepify.Models.Db.Order
+@{
+    Layout = "_Layout";
+    ViewData["Title"] = "รายละเอียดคำสั่งซื้อ";
+    var orderDetails = ViewBag.OrderDetails as IEnumerable<dynamic>;
+}
+
+<div class="container mt-4 mb-5">
+    <nav aria-label="breadcrumb">
+        <ol class="breadcrumb">
+            <li class="breadcrumb-item"><a asp-action="History">ประวัติการสั่งซื้อ</a></li>
+            <li class="breadcrumb-item active" aria-current="page">บิล #ORD-@Model.OrderId</li>
+        </ol>
+    </nav>
+
+    <div class="row">
+        <div class="col-md-8 mb-4">
+            <div class="card border-0 shadow-sm">
+                <div class="card-header bg-white py-3 d-flex justify-content-between align-items-center">
+                    <h5 class="mb-0 fw-bold">รายการสินค้า</h5>
+                    <span class="text-muted">สั่งเมื่อ: @(Model.OrderDate?.ToString("dd/MM/yyyy HH:mm"))</span>
+                </div>
+                <div class="card-body p-0">
+                    <ul class="list-group list-group-flush">
+                        @foreach (var item in orderDetails)
+                        {
+                            <li class="list-group-item d-flex justify-content-between align-items-center p-3">
+                                <div class="d-flex align-items-center">
+                                    <img src="@item.ImageUrl" class="rounded me-3" style="width: 60px; height: 60px; object-fit: cover;">
+                                    <div>
+                                        <h6 class="mb-0 fw-bold">@item.Name</h6>
+                                        <small class="text-muted">ไซส์: @item.Size | สี: @item.Color</small>
+                                    </div>
+                                </div>
+                                <div class="text-end">
+                                    <div>@item.UnitPrice.ToString("N2") ฿ x @item.Quantity</div>
+                                    <strong class="text-success">@item.SubTotal.ToString("N2") ฿</strong>
+                                </div>
+                            </li>
+                        }
+                    </ul>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-4">
+            <div class="card border-0 shadow-sm mb-3">
+                <div class="card-header bg-light py-3">
+                    <h6 class="mb-0 fw-bold">ข้อมูลการจัดส่ง</h6>
+                </div>
+                <div class="card-body">
+                    <p class="mb-1" style="white-space: pre-wrap;">@Model.ShippingAddress</p>
+                    <hr>
+                    <div class="mb-1"><strong>สถานะการชำระเงิน:</strong> @Model.PaymentStatus</div>
+                    <div>
+                        <strong>สถานะพัสดุ:</strong> @Model.ShippingStatus
+                        @if(!string.IsNullOrEmpty(Model.TrackingNumber))
+                        {
+                            <div class="mt-2 text-primary"><i class="fa-solid fa-truck-fast"></i> เลขพัสดุ: <strong>@Model.TrackingNumber</strong></div>
+                        }
+                    </div>
+                </div>
+            </div>
+
+            <div class="card border-0 shadow-sm bg-primary text-white">
+                <div class="card-body">
+                    <div class="d-flex justify-content-between mb-1">
+                        <span>ยอดรวมสินค้า</span>
+                        <span>@Model.TotalAmount.ToString("N2") ฿</span>
+                    </div>
+                    <div class="d-flex justify-content-between mb-2">
+                        <span>ส่วนลด</span>
+                        <span>- @(Model.PromoDiscount?.ToString("N2") ?? "0.00") ฿</span>
+                    </div>
+                    <hr class="border-white opacity-50">
+                    <div class="d-flex justify-content-between fs-5 fw-bold">
+                        <span>ยอดชำระสุทธิ</span>
+                        <span>@Model.NetAmount.ToString("N2") ฿</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

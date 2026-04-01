@@ -39,10 +39,9 @@ else
                     <div class="card-footer bg-white border-top-0 pb-3">
                         <div class="d-grid gap-2">
                             <a href="/Product/Details/@item.ProductId" class="btn btn-outline-primary">รายละเอียด</a>
-                            <form asp-controller="Cart" asp-action="AddToCart" method="post">
-                                <input type="hidden" name="productId" value="@item.ProductId" />
-                                <button type="submit" class="btn btn-primary w-100"><i class="fa-solid fa-cart-plus"></i> เพิ่มลงตะกร้า</button>
-                            </form>
+                            <a href="/Product/Details/@item.ProductId" class="btn btn-primary w-100">
+    <i class="fa-solid fa-hand-pointer me-1"></i> เลือกไซส์ / สั่งซื้อ
+</a>
                         </div>
                     </div>
                 </div>
