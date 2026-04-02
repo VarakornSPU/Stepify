@@ -5,7 +5,7 @@ using Microsoft.AspNetCore.Authorization;
 
 namespace Stepify.Controllers
 {
-  [Authorize(Roles = "Warehouse, Admin")] // <--- อนาคตถ้ามี Role สามารถปลดคอมเมนต์ตรงนี้ได้เลยครับ
+  [Authorize(Roles = "Warehouse, Admin")]
   public class WarehouseController : Controller
   {
     private readonly StepifyContext _db;
@@ -15,8 +15,14 @@ namespace Stepify.Controllers
       _db = db;
     }
 
+    public IActionResult Index()
+    {
+      // ให้เด้งไปหน้าจัดการสต็อกอัตโนมัติ
+      return RedirectToAction("ManageStock");
+    }
+
     // ==========================================
-    // 1. หน้าจัดการคลังสินค้า (Warehouse - Manage Stock)
+    // 🌟 ส่วนของเดิม: จัดการสต็อกสินค้า (ที่หายไป)
     // ==========================================
     public IActionResult ManageStock()
     {
@@ -39,9 +45,6 @@ namespace Stepify.Controllers
       return View();
     }
 
-    // ==========================================
-    // 2. ฟังก์ชันอัปเดตจำนวนสต๊อก (POST)
-    // ==========================================
     [HttpPost]
     public IActionResult UpdateStock(int VariantId, int NewStockQty)
     {
@@ -52,17 +55,82 @@ namespace Stepify.Controllers
         _db.ProductVariants.Update(variant);
         _db.SaveChanges();
       }
-
       return RedirectToAction("ManageStock");
     }
-    // หน้าดูรายการที่ต้องส่งของวันนี้
-    public IActionResult PendingShipments()
+
+    // ==========================================
+    // 🌟 ส่วนใหม่: รายการคำสั่งซื้อที่ต้องจัดส่ง
+    // ==========================================
+    public IActionResult ManageOrders()
     {
-      // ดึงเฉพาะออเดอร์ที่จ่ายเงินแล้ว (Paid) และยังไม่ได้ส่ง (Packing)
       var orders = _db.Orders
-                      .Where(o => o.PaymentStatus == "Paid" && o.ShippingStatus == "Packing")
-                      .ToList();
+          .Where(o => (o.PaymentStatus == "Paid" || (o.PaymentStatus == "Pending" && o.ShippingStatus == "Packing"))
+                      && o.ShippingStatus != "Delivered"
+                      && o.ShippingStatus != "Cancelled")
+          .OrderBy(o => o.OrderDate)
+          .ToList();
+
       return View(orders);
+    }
+
+    public IActionResult OrderDetails(int id)
+    {
+      var order = _db.Orders.FirstOrDefault(o => o.OrderId == id);
+      if (order == null) return RedirectToAction("ManageOrders");
+
+      ViewBag.OrderDetails = (from od in _db.OrderDetails
+                              where od.OrderId == id
+                              join v in _db.ProductVariants on od.VariantId equals v.VariantId
+                              join p in _db.Products on v.ProductId equals p.ProductId
+                              let img = _db.ProductImages.FirstOrDefault(i => i.ProductId == p.ProductId && i.IsPrimary == true)
+                              select new
+                              {
+                                p.Name,
+                                v.Size,
+                                v.Color,
+                                od.Quantity,
+                                ImageUrl = img != null ? img.ImageUrl : "https://via.placeholder.com/50"
+                              }).ToList();
+
+      ViewBag.Customer = _db.Users.FirstOrDefault(u => u.UserId == order.UserId);
+      return View(order);
+    }
+
+    [HttpPost]
+    public IActionResult UpdateShippingStatus(int OrderId, string ShippingStatus, string TrackingNumber)
+    {
+      var order = _db.Orders.FirstOrDefault(o => o.OrderId == OrderId);
+      if (order != null)
+      {
+        order.ShippingStatus = ShippingStatus;
+        if (!string.IsNullOrEmpty(TrackingNumber))
+        {
+          order.TrackingNumber = TrackingNumber;
+        }
+        _db.Orders.Update(order);
+        _db.SaveChanges();
+        TempData["SuccessMsg"] = "อัปเดตสถานะการจัดส่งเรียบร้อยแล้ว";
+      }
+      return RedirectToAction("ManageOrders");
+    }
+
+    [HttpPost]
+    public IActionResult ReportIssue(string Title, string Description)
+    {
+      var newIssue = new IssueReport
+      {
+        Title = Title,
+        Description = Description,
+        ReportedBy = User.Identity.Name,
+        CreatedAt = DateTime.Now,
+        Status = "Pending"
+      };
+
+      _db.IssueReports.Add(newIssue);
+      _db.SaveChanges();
+
+      TempData["SuccessMsg"] = "ส่งแจ้งปัญหาไปยัง Admin เรียบร้อยแล้ว";
+      return RedirectToAction("ManageStock");
     }
   }
 }

@@ -1,79 +1,92 @@
 @using System.Security.Claims
 <!DOCTYPE html>
 <html lang="th">
+
 <head>
-    <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>@ViewData["Title"] - Stepify Warehouse</title>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>@ViewData["Title"] - Stepify Warehouse</title>
     
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Poppins:wght@600;700;800&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link
+  href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Poppins:wght@600;700;800&display=swap"
+  rel="stylesheet">
+  <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
     
-    <link rel="stylesheet" href="~/css/base.css" asp-append-version="true" />
-    <link rel="stylesheet" href="~/css/admin.css" asp-append-version="true" />
-    <link rel="stylesheet" href="~/css/components.css" asp-append-version="true" />
+  <link rel="stylesheet" href="~/css/base.css" asp-append-version="true" />
+  <link rel="stylesheet" href="~/css/admin.css" asp-append-version="true" />
+  <link rel="stylesheet" href="~/css/components.css" asp-append-version="true" />
 </head>
+
 <body>
-    <div class="d-flex">
-        <aside class="admin-sidebar" style="background-color: #1e3a5f;"> <a href="/Warehouse/ManageStock" class="admin-brand text-decoration-none">
-                <i class="fa-solid fa-boxes-packing"></i>
-                <span>Stepify Warehouse</span>
-            </a>
+  <div class="d-flex">
+    <aside class="admin-sidebar" style="background-color: #1e3a5f;"> <a href="/Warehouse/ManageStock"
+                                                                        class="admin-brand text-decoration-none">
+      <i class="fa-solid fa-boxes-packing"></i>
+      <span>Stepify Warehouse</span>
+    </a>
             
-            <nav class="admin-nav">
-                <ul class="nav flex-column">
-                    <li class="nav-item">
-                        <a href="/Warehouse/ManageStock"
-                           class="nav-link @(ViewContext.RouteData.Values["Controller"]?.ToString() == "Warehouse" ? "active" : "")">
-                            <i class="fa-solid fa-boxes-stacked"></i>
-                            <span>คลังสินค้า (Stock)</span>
-                        </a>
-                    </li>
-                    <li class="nav-item">
-                        <a href="/Admin/ManageProducts"
-                           class="nav-link @(ViewContext.RouteData.Values["Action"]?.ToString() == "ManageProducts" ? "active" : "")">
-                            <i class="fa-solid fa-tags"></i>
-                            <span>ดูรายการสินค้า</span>
-                        </a>
-                    </li>
-                    <li class="nav-item">
-                        <a href="/Admin/ManageOrders" 
-                           class="nav-link @(ViewContext.RouteData.Values["Action"]?.ToString() == "ManageOrders" ? "active" : "")">
-                            <i class="fa-solid fa-truck-fast"></i>
-                            <span>จัดการพัสดุจัดส่ง</span>
-                        </a>
-                    </li>
-                </ul>
-            </nav>
+    <nav class="admin-nav">
+      <ul class="nav flex-column">
+        <li class="nav-item">
+          @* 🌟 1. เปลี่ยนจากเช็ค Controller มาเช็ค Action เป็น ManageStock แทน *@
+          <a href="/Warehouse/ManageStock"
+             class="nav-link @(ViewContext.RouteData.Values["Action"]?.ToString() == "ManageStock" ? "active" : "text-white-50")">
+            <i class="fa-solid fa-boxes-stacked"></i>
+            <span>คลังสินค้า (Stock)</span>
+          </a>
+        </li>
+        <li class="nav-item">
+          <a href="/Admin/ManageProducts"
+             class="nav-link @(ViewContext.RouteData.Values["Action"]?.ToString() == "ManageProducts" ? "active" : "text-white-50")">
+            <i class="fa-solid fa-tags"></i>
+            <span>ดูรายการสินค้า</span>
+          </a>
+        </li>
+        <li class="nav-item">
+          @* 🌟 2. เปลี่ยน href เป็น /Warehouse/ManageOrders และเช็คเงื่อนไขให้ครอบคลุมหน้าแพ็คของ (OrderDetails) *@
+          <a href="/Warehouse/ManageOrders"
+             class="nav-link @(ViewContext.RouteData.Values["Action"]?.ToString() == "ManageOrders" || ViewContext.RouteData.Values["Action"]?.ToString() == "OrderDetails" ? "active" : "text-white-50")">
+            <i class="fa-solid fa-truck-fast"></i>
+            <span>จัดการพัสดุจัดส่ง</span>
+          </a>
+        </li>
+      </ul>
+    </nav>
             
-            <div class="admin-user">
-                <div class="dropdown">
-                    <button class="admin-user-btn dropdown-toggle" type="button" id="warehouseUserDropdown" data-bs-toggle="dropdown" aria-expanded="false">
-                        <img src="https://ui-avatars.com/api/?name=@User.Identity.Name&background=198754&color=fff&bold=true" alt="Warehouse" class="admin-user-avatar">
-                        <div class="admin-user-info">
-                            <div class="admin-user-name">@User.Identity.Name</div>
-                            <div class="admin-user-role">Warehouse Staff</div>
-                        </div>
-                    </button>
-                    <ul class="dropdown-menu dropdown-menu-dark" aria-labelledby="warehouseUserDropdown">
-                        <li><a class="dropdown-item" href="/"><i class="fa-solid fa-store me-2"></i> กลับไปหน้าร้านค้า</a></li>
-                        <li><hr class="dropdown-divider"></li>
-                        <li><a class="dropdown-item text-danger" href="/Auth/Logout"><i class="fa-solid fa-right-from-bracket me-2"></i> ออกจากระบบ</a></li>
-                    </ul>
-                </div>
-            </div>
-        </aside>
+    <div class="admin-user">
+      <div class="dropdown">
+        <button class="admin-user-btn dropdown-toggle" type="button" id="warehouseUserDropdown"
+                data-bs-toggle="dropdown" aria-expanded="false">
+          <img src="https://ui-avatars.com/api/?name=@User.Identity.Name&background=198754&color=fff&bold=true"
+               alt="Warehouse" class="admin-user-avatar">
+          <div class="admin-user-info">
+            <div class="admin-user-name">@User.Identity.Name</div>
+            <div class="admin-user-role">Warehouse Staff</div>
+          </div>
+        </button>
+        <ul class="dropdown-menu dropdown-menu-dark" aria-labelledby="warehouseUserDropdown">
+          <li><a class="dropdown-item" href="/"><i class="fa-solid fa-store me-2"></i> กลับไปหน้าร้านค้า</a></li>
+          <li>
+            <hr class="dropdown-divider">
+          </li>
+          <li><a class="dropdown-item text-danger" href="/Auth/Logout"><i
+            class="fa-solid fa-right-from-bracket me-2"></i> ออกจากระบบ</a></li>
+          </ul>
+        </div>
+      </div>
+    </aside>
 
-        <main class="admin-main">
-            @RenderBody()
-        </main>
-    </div>
+    <main class="admin-main">
+      @RenderBody()
+    </main>
+  </div>
 
-    <script src="~/lib/jquery/dist/jquery.min.js"></script>
-    <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
-    @await RenderSectionAsync("Scripts", required: false)
+  <script src="~/lib/jquery/dist/jquery.min.js"></script>
+  <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
+  @await RenderSectionAsync("Scripts", required: false)
 </body>
+
 </html>

@@ -8,6 +8,40 @@
     <div class="d-flex justify-content-between align-items-center mb-4">
         <h3 class="fw-bold"><i class="fa-solid fa-boxes-stacked text-primary"></i> คลังสินค้า (Warehouse)</h3>
     </div>
+    
+            <button type="button" class="btn btn-danger fw-bold shadow-sm" data-bs-toggle="modal"
+                    data-bs-target="#reportIssueModal">
+                <i class="fa-solid fa-triangle-exclamation me-1"></i> แจ้งปัญหาให้ Admin
+            </button>
+
+            <div class="modal fade" id="reportIssueModal" tabindex="-1">
+                <div class="modal-dialog">
+                    <div class="modal-content border-0 shadow">
+                        <div class="modal-header bg-danger text-white">
+                            <h5 class="modal-title fw-bold">แจ้งปัญหาสินค้า / คลังสินค้า</h5>
+                            <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+                        </div>
+                        <form asp-action="ReportIssue" method="post">
+                            <div class="modal-body">
+                                <div class="mb-3">
+                                    <label class="form-label fw-bold">หัวข้อปัญหา</label>
+                                    <input type="text" name="Title" class="form-control"
+                                           placeholder="เช่น สต็อกรองเท้ารุ่น... หายไป 1 คู่" required>
+                                </div>
+                                <div class="mb-3">
+                                    <label class="form-label fw-bold">รายละเอียด</label>
+                                    <textarea name="Description" class="form-control" rows="4"
+                                              placeholder="ระบุไซส์ สี หรือปัญหาที่พบอย่างละเอียด" required></textarea>
+                                </div>
+                            </div>
+                            <div class="modal-footer bg-light">
+                                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">ยกเลิก</button>
+                                <button type="submit" class="btn btn-danger fw-bold">ส่งรายงาน</button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
 
     <div class="card border-0 shadow-sm">
         <div class="card-body p-0">
@@ -29,32 +63,49 @@
                         {
                             <tr>
                                 <td class="ps-4">
-                                    <img src="@item.ImageUrl" class="rounded" style="width: 50px; height: 50px; object-fit: cover;">
+                                    <img src="@item.ImageUrl" class="rounded"
+                                         style="width: 50px; height: 50px; object-fit: cover;">
                                 </td>
                                 <td class="fw-bold">@item.Name</td>
                                 <td>@item.Color</td>
                                 <td class="text-center fw-bold text-primary fs-5">@item.Size</td>
                                 <td class="text-center">
-                                    @if(item.StockQty <= 0) { <span class="badge bg-danger fs-6">หมด (Out of Stock)</span> }
-                                    else if(item.StockQty < 5) { <span class="badge bg-warning text-dark fs-6">@item.StockQty (ใกล้หมด)</span> }
-                                    else { <span class="badge bg-success fs-6">@item.StockQty</span> }
-                                </td>
-                                <td class="pe-4">
-                                    <form asp-controller="Warehouse" asp-action="UpdateStock" method="post" class="d-flex gap-2">
-                                        <input type="hidden" name="VariantId" value="@item.VariantId" />
-                                        <input type="number" name="NewStockQty" class="form-control form-control-sm text-center" value="@item.StockQty" min="0" required>
-                                        <button type="submit" class="btn btn-sm btn-primary">บันทึก</button>
-                                    </form>
-                                </td>
+                                    @if (item.StockQty <= 0)
+                                    {
+                                        <span class="badge bg-danger fs-6">หมด (Out of Stock)</span>
+                                    }
+                                    else if (item.StockQty < 5)
+                                    {
+
+                                        <span class="badge bg-warning text-dark fs-6">@item.StockQty
+                                            (ใกล้หมด)</span>
+                                        }
+                                    else
+                                        {
+
+                                            <span class="badge bg-success fs-6">@item.StockQty</span>
+                                        }
+                                    </td>
+                                    <td class="pe-4">
+                                        <form asp-controller="Warehouse" asp-action="UpdateStock" method="post"
+                                              class="d-flex gap-2">
+                                            <input type="hidden" name="VariantId" value="@item.VariantId" />
+                                            <input type="number" name="NewStockQty" class="form-control form-control-sm text-center"
+                                                   value="@item.StockQty" min="0" required>
+                                            <button type="submit" class="btn btn-sm btn-primary">บันทึก</button>
+                                        </form>
+                                    </td>
+                                </tr>
+                            }
+                        }
+                    else
+                        {
+                            <tr>
+                                <td colspan="6" class="text-center py-4 text-muted">ยังไม่มีข้อมูลสินค้าในคลัง</td>
                             </tr>
                         }
-                    }
-                    else
-                    {
-                        <tr><td colspan="6" class="text-center py-4 text-muted">ยังไม่มีข้อมูลสินค้าในคลัง</td></tr>
-                    }
-                </tbody>
-            </table>
+                    </tbody>
+                </table>
+            </div>
         </div>
     </div>
-</div>

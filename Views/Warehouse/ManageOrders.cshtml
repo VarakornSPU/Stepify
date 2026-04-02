@@ -1,0 +1,67 @@
+@model IEnumerable<Stepify.Models.Db.Order>
+@{
+    Layout = "_WarehouseLayout";
+    ViewData["Title"] = "รายการที่ต้องจัดส่ง";
+}
+
+<div class="container-fluid mt-4">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h2 class="fw-bold"><i class="fa-solid fa-box-open text-primary me-2"></i>รายการที่ต้องจัดส่ง (Fulfillment)</h2>
+    </div>
+
+    @if (TempData["SuccessMsg"] != null)
+    {
+        <div class="alert alert-success shadow-sm"><i class="fa-solid fa-circle-check me-2"></i>@TempData["SuccessMsg"]</div>
+    }
+
+    <div class="card border-0 shadow-sm rounded-4">
+        <div class="card-body p-0">
+            <div class="table-responsive">
+                <table class="table table-hover align-middle mb-0">
+                    <thead class="table-light">
+                        <tr>
+                            <th class="ps-4">เลขที่บิล</th>
+                            <th>วันที่สั่งซื้อ</th>
+                            <th>สถานะการจ่ายเงิน</th>
+                            <th>สถานะพัสดุ</th>
+                            <th class="text-center pe-4">จัดการ</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach (var o in Model)
+                        {
+                            <tr>
+                                <td class="ps-4 fw-bold">#ORD-@o.OrderId</td>
+                                <td>@(o.OrderDate?.ToString("dd/MM/yyyy HH:mm"))</td>
+                                <td>
+                                    <span class="badge @(o.PaymentStatus == "Paid" ? "bg-success" : "bg-warning text-dark")">
+                                        @o.PaymentStatus
+                                    </span>
+                                </td>
+                                <td>
+                                    <span class="badge @(o.ShippingStatus == "Packing" ? "bg-warning text-dark" : "bg-primary")">
+                                        @o.ShippingStatus
+                                    </span>
+                                </td>
+                                <td class="text-center pe-4">
+                                    <a asp-action="OrderDetails" asp-route-id="@o.OrderId" class="btn btn-sm btn-primary fw-bold shadow-sm">
+                                        <i class="fa-solid fa-box me-1"></i> แพ็คสินค้า
+                                    </a>
+                                </td>
+                            </tr>
+                        }
+                        @if (!Model.Any())
+                        {
+                            <tr>
+                                <td colspan="5" class="text-center py-5 text-muted">
+                                    <i class="fa-solid fa-clipboard-check fa-3x mb-3"></i>
+                                    <h5>ไม่มีรายการค้างส่งในขณะนี้</h5>
+                                </td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>

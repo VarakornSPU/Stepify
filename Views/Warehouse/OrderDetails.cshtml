@@ -1,0 +1,105 @@
+@model Stepify.Models.Db.Order
+@{
+    Layout = "_WarehouseLayout";
+    ViewData["Title"] = "แพ็คสินค้า";
+    var orderDetails = ViewBag.OrderDetails as IEnumerable<dynamic>;
+    var customer = ViewBag.Customer as Stepify.Models.Db.User;
+}
+
+<div class="container-fluid mt-4 mb-5">
+    <div class="d-flex justify-content-between align-items-center mb-4 d-print-none">
+        <h3 class="fw-bold"><i class="fa-solid fa-box text-primary me-2"></i> แพ็คสินค้าบิล #ORD-@Model.OrderId</h3>
+        <div>
+            <button onclick="window.print()" class="btn btn-secondary fw-bold me-2"><i class="fa-solid fa-print me-1"></i> พิมพ์ใบปะหน้า</button>
+            <a asp-action="ManageOrders" class="btn btn-outline-secondary fw-bold">กลับหน้ารายการ</a>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-md-8">
+            <div class="card border-0 shadow-sm mb-4">
+                <div class="card-header bg-white py-3 d-flex justify-content-between align-items-center">
+                    <h5 class="mb-0 fw-bold"><i class="fa-solid fa-clipboard-check text-warning me-2"></i>รายการที่ต้องหยิบ (Pick List)</h5>
+                </div>
+                <div class="card-body p-0">
+                    <ul class="list-group list-group-flush">
+                        @foreach (var item in orderDetails)
+                        {
+                            <li class="list-group-item d-flex justify-content-between align-items-center p-3 pick-item">
+                                <div class="d-flex align-items-center">
+                                    <img src="@item.ImageUrl" class="rounded border me-3" style="width: 70px; height: 70px; object-fit: cover;">
+                                    <div>
+                                        <h5 class="mb-1 fw-bold text-dark item-name">@item.Name</h5>
+                                        <span class="badge bg-light text-dark border fs-6 me-1">ไซส์: @item.Size</span>
+                                        <span class="badge bg-light text-dark border fs-6">สี: @item.Color</span>
+                                    </div>
+                                </div>
+                                <div class="text-end">
+                                    <h2 class="fw-bold text-primary mb-0">x @item.Quantity</h2>
+                                </div>
+                            </li>
+                        }
+                    </ul>
+                </div>
+            </div>
+
+            <div class="card border-0 shadow-sm mb-4 shipping-label">
+                <div class="card-body p-4">
+                    <div class="text-center mb-3 border-bottom pb-3">
+                        <h4 class="fw-bold"><i class="fa-solid fa-truck-fast me-2"></i> ใบปะหน้าพัสดุ (Shipping Label)</h4>
+                        <p class="mb-0"><strong>Order ID:</strong> #ORD-@Model.OrderId</p>
+                    </div>
+                    <div class="row">
+                        <div class="col-6">
+                            <h6 class="fw-bold text-muted">ผู้ส่ง (Sender):</h6>
+                            <p class="fw-bold mb-0">Stepify Store</p>
+                            <p>123 ถ.สุขุมวิท กรุงเทพฯ 10110<br>โทร: 02-123-4567</p>
+                        </div>
+                        <div class="col-6 border-start">
+                            <h6 class="fw-bold text-danger">ผู้รับ (Receiver):</h6>
+                            <h5 class="fw-bold mb-1">คุณ @(customer?.Username ?? "ไม่ทราบชื่อ")</h5>
+                            <p class="mb-0 fs-5" style="white-space: pre-wrap;">@Model.ShippingAddress</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-4 d-print-none">
+            <div class="card border-0 shadow-sm border-top border-primary border-4">
+                <div class="card-body p-4">
+                    <h5 class="fw-bold mb-4">อัปเดตการจัดส่ง</h5>
+                    <form asp-action="UpdateShippingStatus" method="post" id="packForm">
+                        <input type="hidden" name="OrderId" value="@Model.OrderId" />
+                        <div class="mb-3">
+                            <label class="form-label fw-bold">สถานะพัสดุ</label>
+                            <select name="ShippingStatus" class="form-select border-primary" required>
+                                <option value="Packing" selected="@(Model.ShippingStatus == "Packing")">📦 กำลังแพ็ค (Packing)</option>
+                                <option value="Shipped" selected="@(Model.ShippingStatus == "Shipped")">🚚 จัดส่งให้ขนส่งแล้ว (Shipped)</option>
+                            </select>
+                        </div>
+                        <div class="mb-4">
+                            <label class="form-label fw-bold">เลขพัสดุ (Tracking Number)</label>
+                            <input type="text" name="TrackingNumber" class="form-control" value="@Model.TrackingNumber" placeholder="กรอกเมื่อส่งสินค้าแล้ว..." />
+                        </div>
+                        <button type="submit" class="btn btn-primary w-100 fw-bold py-2 shadow-sm" onclick="return checkAllPacked()">
+                            <i class="fa-solid fa-floppy-disk me-1"></i> บันทึกข้อมูล
+                        </button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+
+    <style>
+        /* ซ่อนส่วนอื่นๆ เวลาสั่งปริ้นใบปะหน้า */
+        @@media print {
+            body * { visibility: hidden; }
+            .shipping-label, .shipping-label * { visibility: visible; }
+            .shipping-label { position: absolute; left: 0; top: 0; width: 100%; border: 2px solid #000 !important; }
+        }
+    </style>
+}
