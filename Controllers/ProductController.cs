@@ -45,18 +45,30 @@ namespace Stepify.Controllers
 
       // 🌟 2. เช็คว่าคนที่ล็อกอินอยู่ "เคยซื้อ" สินค้านี้ไหม?
       bool hasPurchased = false;
+      bool alreadyReviewed = false; // เพิ่มตัวแปรเช็คการรีวิว
+
       if (User.Identity != null && User.Identity.IsAuthenticated)
       {
         int currentUserId = int.Parse(User.FindFirst("UserId").Value);
 
-        // เช็คจากประวัติ Order -> OrderDetails -> Variant -> Product
-        hasPurchased = (from o in _db.Orders
-                        join od in _db.OrderDetails on o.OrderId equals od.OrderId
-                        join v in _db.ProductVariants on od.VariantId equals v.VariantId
-                        where o.UserId == currentUserId && v.ProductId == id
-                        select o).Any();
+        // ดึง OrderId ล่าสุดที่ลูกค้าคนนี้ซื้อสินค้านี้
+        var latestOrderId = (from o in _db.Orders
+                             join od in _db.OrderDetails on o.OrderId equals od.OrderId
+                             join v in _db.ProductVariants on od.VariantId equals v.VariantId
+                             where o.UserId == currentUserId && v.ProductId == id
+                             orderby o.OrderDate descending
+                             select o.OrderId).FirstOrDefault();
+
+        if (latestOrderId != 0)
+        {
+          hasPurchased = true;
+          // เช็คว่าบิลล่าสุดนี้ เคยถูกนำมารีวิวสินค้านี้ไปแล้วหรือยัง
+          alreadyReviewed = _db.Reviews.Any(r => r.UserId == currentUserId && r.ProductId == id && r.OrderId == latestOrderId);
+        }
       }
+
       ViewBag.HasPurchased = hasPurchased;
+      ViewBag.AlreadyReviewed = alreadyReviewed; // ส่งค่าไปบอกหน้าเว็บว่าเคยรีวิวแล้ว
 
       return View(product);
     }
@@ -68,57 +80,96 @@ namespace Stepify.Controllers
     [Microsoft.AspNetCore.Authorization.Authorize] // ต้องล็อกอินถึงจะรีวิวได้
     public IActionResult AddReview(int ProductId, int Rating, string Comment)
     {
-        int currentUserId = int.Parse(User.FindFirst("UserId").Value);
+      int currentUserId = int.Parse(User.FindFirst("UserId").Value);
 
-        // 1. ค้นหา OrderId ล่าสุดที่ลูกค้าคนนี้เคยสั่งซื้อสินค้านี้ (เพราะตาราง Review บังคับเก็บ OrderId)
-        var latestOrderId = (from o in _db.Orders
-                             join od in _db.OrderDetails on o.OrderId equals od.OrderId
-                             join v in _db.ProductVariants on od.VariantId equals v.VariantId
-                             where o.UserId == currentUserId && v.ProductId == ProductId
-                             orderby o.OrderDate descending
-                             select o.OrderId).FirstOrDefault();
+      // 1. ค้นหา OrderId ล่าสุดที่ลูกค้าคนนี้เคยสั่งซื้อสินค้านี้ (เพราะตาราง Review บังคับเก็บ OrderId)
+      var latestOrderId = (from o in _db.Orders
+                           join od in _db.OrderDetails on o.OrderId equals od.OrderId
+                           join v in _db.ProductVariants on od.VariantId equals v.VariantId
+                           where o.UserId == currentUserId && v.ProductId == ProductId
+                           orderby o.OrderDate descending
+                           select o.OrderId).FirstOrDefault();
 
-        // ถ้าหาบิลไม่เจอ แปลว่าไม่ได้ซื้อจริง ให้เด้งกลับ
-        if (latestOrderId == 0) return RedirectToAction("Details", new { id = ProductId });
+      // ถ้าหาบิลไม่เจอ แปลว่าไม่ได้ซื้อจริง ให้เด้งกลับ
+      if (latestOrderId == 0) return RedirectToAction("Details", new { id = ProductId });
 
-        // 2. เช็คว่าลูกค้าเคยรีวิวสินค้านี้ ในบิลนี้ไปแล้วหรือยัง? (ป้องกันการปั๊มรีวิวเอาคูปอง)
-        bool alreadyReviewed = _db.Reviews.Any(r => r.UserId == currentUserId && r.ProductId == ProductId && r.OrderId == latestOrderId);
-        
-        if (!alreadyReviewed)
+      // 2. เช็คว่าลูกค้าเคยรีวิวสินค้านี้ ในบิลนี้ไปแล้วหรือยัง? (ป้องกันการปั๊มรีวิวเอาคูปอง)
+      bool alreadyReviewed = _db.Reviews.Any(r => r.UserId == currentUserId && r.ProductId == ProductId && r.OrderId == latestOrderId);
+
+      if (!alreadyReviewed)
+      {
+        // 3. บันทึกข้อมูลรีวิวลงฐานข้อมูล
+        var newReview = new Review
         {
-            // 3. บันทึกข้อมูลรีวิวลงฐานข้อมูล
-            var newReview = new Review {
-                UserId = currentUserId,
-                ProductId = ProductId,
-                OrderId = latestOrderId,
-                Rating = Rating,
-                Comment = Comment,
-                CreatedAt = DateTime.Now,
-                IsRewardClaimed = true // บันทึกว่ารับรางวัลจากรีวิวนี้ไปแล้ว
-            };
-            _db.Reviews.Add(newReview);
+          UserId = currentUserId,
+          ProductId = ProductId,
+          OrderId = latestOrderId,
+          Rating = Rating,
+          Comment = Comment,
+          CreatedAt = DateTime.Now,
+          IsRewardClaimed = true // บันทึกว่ารับรางวัลจากรีวิวนี้ไปแล้ว
+        };
+        _db.Reviews.Add(newReview);
 
-            // 🌟 4. ไฮไลท์สำคัญ: แจกคูปอง 100 บาท เข้ากระเป๋าลูกค้าทันที!
-            var rewardVoucher = new UserVoucher {
-                UserId = currentUserId,
-                VoucherType = "ส่วนลดแทนคำขอบคุณจากรีวิว",
-                DiscountValue = 100,
-                IsPercent = false, // ลดเป็นเงินสด 100 บาท
-                IsUsed = false
-            };
-            _db.UserVouchers.Add(rewardVoucher);
-
-            _db.SaveChanges(); // เซฟทุกอย่างลง Database
-            
-            TempData["SuccessMsg"] = "ขอบคุณสำหรับรีวิว! คุณได้รับคูปองส่วนลด 100 บาท สำหรับใช้งานในครั้งถัดไป";
-        }
-        else
+        // 🌟 4. ไฮไลท์สำคัญ: แจกคูปอง 100 บาท เข้ากระเป๋าลูกค้าทันที!
+        var rewardVoucher = new UserVoucher
         {
-            TempData["ErrorMsg"] = "คุณได้รีวิวสินค้าจากคำสั่งซื้อนี้ไปแล้ว";
-        }
+          UserId = currentUserId,
+          VoucherType = "ส่วนลดแทนคำขอบคุณจากรีวิว",
+          DiscountValue = 100,
+          IsPercent = false, // ลดเป็นเงินสด 100 บาท
+          IsUsed = false
+        };
+        _db.UserVouchers.Add(rewardVoucher);
 
-        // รีเฟรชหน้าสินค้าเดิม
-        return RedirectToAction("Details", new { id = ProductId });
+        _db.SaveChanges(); // เซฟทุกอย่างลง Database
+
+        TempData["SuccessMsg"] = "ขอบคุณสำหรับรีวิว! คุณได้รับคูปองส่วนลด 100 บาท สำหรับใช้งานในครั้งถัดไป";
+      }
+      else
+      {
+        TempData["ErrorMsg"] = "คุณได้รีวิวสินค้าจากคำสั่งซื้อนี้ไปแล้ว";
+      }
+
+      // รีเฟรชหน้าสินค้าเดิม
+      return RedirectToAction("Details", new { id = ProductId });
+    }
+
+    public IActionResult AllProducts(string brand, string sort)
+    {
+      // ดึงสินค้าพร้อมรูปหลัก เหมือนหน้า Home
+      var productsQuery = (from p in _db.Products
+                           where p.IsActive == true
+                           let primaryImg = _db.ProductImages.FirstOrDefault(i => i.ProductId == p.ProductId && i.IsPrimary == true)
+                           select new
+                           {
+                             p.ProductId,
+                             p.Name,
+                             p.Brand,
+                             p.Price,
+                             ImageUrl = primaryImg != null ? primaryImg.ImageUrl : "https://via.placeholder.com/300x300",
+                             p.Description
+                           }).AsQueryable();
+
+      // ระบบ Filter
+      if (!string.IsNullOrEmpty(brand))
+      {
+        productsQuery = productsQuery.Where(p => p.Brand == brand);
+      }
+
+      // ระบบ Sort
+      productsQuery = sort switch
+      {
+        "price_asc" => productsQuery.OrderBy(p => p.Price),
+        "price_desc" => productsQuery.OrderByDescending(p => p.Price),
+        _ => productsQuery.OrderByDescending(p => p.ProductId)
+      };
+
+      ViewBag.Brands = _db.Products.Select(p => p.Brand).Distinct().ToList();
+      ViewBag.SelectedBrand = brand;
+      ViewBag.SelectedSort = sort;
+
+      return View(productsQuery.ToList());
     }
   }
 }

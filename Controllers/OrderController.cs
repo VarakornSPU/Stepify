@@ -123,9 +123,28 @@ namespace Stepify.Controllers
     }
 
     [HttpPost]
-    public IActionResult PlaceOrder(string ShippingAddress, string PaymentMethod, decimal TotalAmount, decimal DiscountAmount, decimal NetAmount, int? UsedVoucherId, int? UsedPromotionId)
+    public IActionResult PlaceOrder(string ShippingAddress, string PaymentMethod, decimal TotalAmount, decimal DiscountAmount, decimal NetAmount, int? UsedVoucherId, int? UsedPromotionId, bool SaveAddressToProfile = false)
     {
+      // 🌟 1. ดักจับ Error Server-side ป้องกันที่อยู่จัดส่งเป็นค่าว่าง 
+      if (string.IsNullOrWhiteSpace(ShippingAddress))
+      {
+        TempData["ErrorMsg"] = "กรุณาระบุที่อยู่จัดส่งให้ครบถ้วนก่อนยืนยันคำสั่งซื้อ";
+        return RedirectToAction("Checkout");
+      }
+
       int currentUserId = int.Parse(User.FindFirst("UserId").Value);
+
+      // 🌟 2. เพิ่มส่วนนี้: ถ้าติ๊กเซฟที่อยู่ ให้ Update กลับไปที่โปรไฟล์ User ด้วย
+      if (SaveAddressToProfile)
+      {
+        var user = _db.Users.FirstOrDefault(u => u.UserId == currentUserId);
+        if (user != null)
+        {
+          user.Address = ShippingAddress;
+          _db.Users.Update(user);
+          // ไม่ต้องรีบ SaveChanges ตรงนี้ เดี๋ยวไป Save พร้อมกันตอนจบบิลทีเดียว
+        }
+      }
       var newOrder = new Order
       {
         UserId = currentUserId,
@@ -197,6 +216,29 @@ namespace Stepify.Controllers
                               let img = _db.ProductImages.FirstOrDefault(i => i.ProductId == p.ProductId && i.IsPrimary == true)
                               select new { p.Name, v.Size, v.Color, od.UnitPrice, od.Quantity, od.SubTotal, ImageUrl = img != null ? img.ImageUrl : "https://via.placeholder.com/100" }).ToList();
       return View(order);
+    }
+    // 🌟 เมธอดสำหรับรับค่าจากปุ่ม "บันทึกที่อยู่ลงโปรไฟล์" ผ่าน AJAX
+    [HttpPost]
+    public IActionResult UpdateProfileAddress(string newAddress)
+    {
+        try 
+        {
+            int currentUserId = int.Parse(User.FindFirst("UserId").Value);
+            var user = _db.Users.FirstOrDefault(u => u.UserId == currentUserId);
+            
+            if (user != null)
+            {
+                user.Address = newAddress;
+                _db.Users.Update(user);
+                _db.SaveChanges();
+                return Json(new { success = true });
+            }
+            return Json(new { success = false, message = "ไม่พบข้อมูลผู้ใช้" });
+        }
+        catch (Exception ex)
+        {
+            return Json(new { success = false, message = ex.Message });
+        }
     }
   }
 }

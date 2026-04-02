@@ -1,0 +1,69 @@
+@model IEnumerable<dynamic>
+@{
+    ViewData["Title"] = "สินค้าทั้งหมด";
+}
+
+<div class="container mt-4 mb-5">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h2 class="fw-bold"><i class="fa-solid fa-store text-primary me-2"></i>สินค้าทั้งหมด</h2>
+    </div>
+
+    <form method="get" class="row g-3 mb-5 p-3 bg-light rounded shadow-sm border">
+        <div class="col-md-5">
+            <label class="form-label fw-bold">แบรนด์</label>
+            <select name="brand" class="form-select" onchange="this.form.submit()">
+                <option value="">ทั้งหมด</option>
+                @foreach (var b in ViewBag.Brands)
+                {
+                    <option value="@b" selected="@(ViewBag.SelectedBrand == b)">@b</option>
+                }
+            </select>
+        </div>
+        <div class="col-md-5">
+            <label class="form-label fw-bold">เรียงตามราคา</label>
+            <select name="sort" class="form-select" onchange="this.form.submit()">
+                <option value="">ล่าสุด</option>
+                <option value="price_asc" selected="@(ViewBag.SelectedSort == "price_asc")">ราคา: ต่ำ - สูง</option>
+                <option value="price_desc" selected="@(ViewBag.SelectedSort == "price_desc")">ราคา: สูง - ต่ำ</option>
+            </select>
+        </div>
+        <div class="col-md-2 d-flex align-items-end">
+            <a asp-action="AllProducts" class="btn btn-secondary w-100">ล้างค่า</a>
+        </div>
+    </form>
+
+    <div class="row g-4">
+        @foreach (var p in Model)
+        {
+            <div class="col-6 col-md-4 col-lg-3">
+                <div class="card h-100 border-0 shadow-sm product-card">
+                    <a asp-action="Details" asp-route-id="@p.ProductId">
+                        <img src="@p.ImageUrl" class="card-img-top p-3" style="height: 200px; object-fit: contain;">
+                    </a>
+                    <div class="card-body d-flex flex-column text-center">
+                        <small class="text-muted">@p.Brand</small>
+                        <h6 class="fw-bold mb-1 text-truncate">@p.Name</h6>
+                        <p class="text-primary fw-bold mb-3">@p.Price.ToString("N0") ฿</p>
+                        
+                        <div class="mt-auto">
+                            @* 🌟 ปุ่มเพิ่มลงตะกร้าแบบปกติ (ไม่ใช้ AJAX) *@
+                            @* หมายเหตุ: เนื่องจากในหน้านี้ไม่มีให้เลือก Size เราจะส่งไปหน้า Details เพื่อให้เลือกไซส์ก่อน *@
+                            <div class="d-grid gap-2">
+                                <a asp-action="Details" asp-route-id="@p.ProductId" class="btn btn-primary fw-bold">
+                                    <i class="fa-solid fa-cart-plus me-1"></i> เลือกไซส์และสั่งซื้อ
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        }
+    </div>
+
+    @if (!Model.Any())
+    {
+        <div class="text-center py-5">
+            <h4 class="text-muted">ไม่พบสินค้าที่คุณต้องการ</h4>
+        </div>
+    }
+</div>

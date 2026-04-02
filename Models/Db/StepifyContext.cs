@@ -179,8 +179,8 @@ public partial class StepifyContext : DbContext
             entity.Property(e => e.IsPercent).HasDefaultValue(false);
             entity.Property(e => e.IsUsed).HasDefaultValue(false);
             entity.Property(e => e.VoucherType)
-                .HasMaxLength(50)
-                .IsUnicode(false);
+                .HasMaxLength(100);
+                
         });
 
         OnModelCreatingPartial(modelBuilder);

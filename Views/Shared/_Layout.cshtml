@@ -50,8 +50,9 @@
                             </a>
                         </li>
                         <li class="nav-item">
-                            <a class="nav-link" href="#">
-                                <i class="fa-solid fa-boxes-stacked me-1"></i> สินค้าทั้งหมด
+                            <a class="nav-link text-dark fw-bold" asp-area="" asp-controller="Product"
+                                   asp-action="AllProducts">
+                                สินค้าทั้งหมด
                             </a>
                         </li>
                     </ul>
@@ -70,9 +71,10 @@
                     <ul class="navbar-nav align-items-center">
                         <!-- Cart -->
                         <li class="nav-item me-2">
-                            <a class="cart-icon-wrapper" asp-controller="Cart" asp-action="Index" title="ตะกร้าสินค้า">
+                            <a class="nav-link position-relative" asp-controller="Cart" asp-action="Index">
                                 <i class="fa-solid fa-cart-shopping"></i>
-                                <span class="cart-badge">0</span>
+                                @* เรียกใช้ ViewComponent ที่เราสร้างไว้ *@
+                                @await Component.InvokeAsync("CartBadge")
                             </a>
                         </li>
 

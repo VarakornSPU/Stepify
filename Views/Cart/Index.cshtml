@@ -1,106 +1,131 @@
 @{
-    Layout = "_Layout";
-    ViewData["Title"] = "ตะกร้าสินค้าของฉัน";
-    var cartItems = ViewBag.CartItems as IEnumerable<dynamic>;
-    decimal totalAmount = ViewBag.TotalAmount ?? 0m;
+  Layout = "_Layout";
+  ViewData["Title"] = "ตะกร้าสินค้าของฉัน";
+  var cartItems = ViewBag.CartItems as IEnumerable<dynamic>;
+  decimal totalAmount = ViewBag.TotalAmount ?? 0m;
 }
 
 <div class="container mt-4 mb-5">
-    <h2 class="fw-bold mb-4"><i class="fa-solid fa-cart-shopping text-primary"></i> ตะกร้าสินค้าของฉัน</h2>
+  <h2 class="fw-bold mb-4"><i class="fa-solid fa-cart-shopping text-primary"></i> ตะกร้าสินค้าของฉัน</h2>
 
-    @if (cartItems != null && cartItems.Any())
-    {
-        <div class="row gx-4">
-            <div class="col-lg-8 mb-4">
-                <div class="card border-0 shadow-sm">
-                    <div class="card-body p-0">
-                        <table class="table table-hover align-middle mb-0">
-                            <thead class="table-light">
-                                <tr>
-                                    <th scope="col" class="ps-4">สินค้า</th>
-                                    <th scope="col" class="text-center">ราคาต่อชิ้น</th>
-                                    <th scope="col" class="text-center">จำนวน</th>
-                                    <th scope="col" class="text-end">ยอดรวม</th>
-                                    <th scope="col" class="text-center pe-4">ลบ</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                @foreach (var item in cartItems)
-                                {
-                                    <tr>
-                                        <td class="ps-4 py-3">
-                                            <div class="d-flex align-items-center">
-                                                <img src="@item.ImageUrl" alt="Product" class="rounded-3 me-3" style="width: 70px; height: 70px; object-fit: cover;">
-                                                <div>
-                                                    <h6 class="mb-0 fw-bold">@item.Name</h6>
-                                                    <small class="text-muted">ไซส์: @item.Size | สี: @item.Color</small>
-                                                </div>
-                                            </div>
-                                        </td>
+  @if (cartItems != null && cartItems.Any())
+  {
+    <div class="row gx-4">
+      <div class="col-lg-8 mb-4">
+        <div class="card border-0 shadow-sm">
+          <div class="card-body p-0">
+            <table class="table table-hover align-middle mb-0">
+              <thead class="table-light">
+                <tr>
+                  <th scope="col" class="ps-4">สินค้า</th>
+                  <th scope="col" class="text-center">ราคาต่อชิ้น</th>
+                  <th scope="col" class="text-center">จำนวน</th>
+                  <th scope="col" class="text-end">ยอดรวม</th>
+                  <th scope="col" class="text-center pe-4">ลบ</th>
+                </tr>
+              </thead>
+              <tbody>
+                @foreach (var item in cartItems)
+                {
+                  <tr>
+                    <td class="ps-4 py-3">
+                      <div class="d-flex align-items-center">
+                        <img src="@item.ImageUrl" alt="Product" class="rounded-3 me-3"
+                             style="width: 70px; height: 70px; object-fit: cover;">
+                        <div>
+                          <h6 class="mb-0 fw-bold">@item.Name</h6>
+                          <small class="text-muted">ไซส์: @item.Size | สี: @item.Color</small>
+                        </div>
+                      </div>
+                    </td>
                                         
-                                        <td class="text-center">@item.Price.ToString("N2")</td>
+                    <td class="text-center">@item.Price.ToString("N2")</td>
                                         
-                                        <td class="text-center fw-bold">@item.Quantity</td>
+                    <td class="text-center">
+                      @* 🌟 ส่วนควบคุมจำนวนสินค้า เพิ่ม-ลด *@
+                      <div class="d-flex justify-content-center">
+                        <form asp-action="UpdateQuantity" method="post"
+                              class="d-flex align-items-center border rounded-pill p-1 bg-light" style="width: fit-content;">
+                          <input type="hidden" name="cartId" value="@item.CartId" />
+            
+                          @* ปุ่มลดจำนวน (-) *@
+                          <button type="submit" name="change" value="-1"
+                                  class="btn btn-sm btn-white rounded-circle border-0 shadow-none">
+                            <i class="fa-solid fa-minus text-muted" style="font-size: 0.8rem;"></i>
+                          </button>
+
+                          @* ตัวเลขจำนวน *@
+                          <span class="px-3 fw-bold" style="min-width: 40px;">@item.Quantity</span>
+
+                          @* ปุ่มเพิ่มจำนวน (+) *@
+                          <button type="submit" name="change" value="1"
+                                  class="btn btn-sm btn-white rounded-circle border-0 shadow-none">
+                            <i class="fa-solid fa-plus text-primary" style="font-size: 0.8rem;"></i>
+                          </button>
+                        </form>
+                      </div>
+                    </td>
                                         
-                                        <td class="text-end fw-bold text-success">@item.SubTotal.ToString("N2")</td>
+                    <td class="text-end fw-bold text-success">@item.SubTotal.ToString("N2")</td>
                                         
-                                        <td class="text-center pe-4">
-                                            <a asp-action="RemoveFromCart" asp-route-id="@item.CartId" class="btn btn-outline-danger btn-sm" onclick="return confirm('ต้องการลบสินค้านี้ออกจากตะกร้าใช่หรือไม่?');">
-                                                <i class="fa-solid fa-trash"></i>
-                                            </a>
-                                        </td>
-                                    </tr>
-                                }
-                            </tbody>
-                        </table>
-                    </div>
-                </div>
+                    <td class="text-center pe-4">
+                      <a asp-action="RemoveFromCart" asp-route-id="@item.CartId" class="btn btn-outline-danger btn-sm"
+                         onclick="return confirm('ต้องการลบสินค้านี้ออกจากตะกร้าใช่หรือไม่?');">
+                        <i class="fa-solid fa-trash"></i>
+                      </a>
+                    </td>
+                  </tr>
+                }
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+
+      <div class="col-lg-4">
+        <div class="card border-0 shadow-sm" style="position: sticky; top: 100px;">
+          <div class="card-header bg-primary text-white py-3">
+            <h5 class="mb-0">สรุปคำสั่งซื้อ (Order Summary)</h5>
+          </div>
+          <div class="card-body p-4">
+            <div class="d-flex justify-content-between mb-3">
+              <span class="text-muted">ยอดรวมสินค้า</span>
+              <span class="fw-bold">@totalAmount.ToString("N2") ฿</span>
             </div>
-
-            <div class="col-lg-4">
-                <div class="card border-0 shadow-sm" style="position: sticky; top: 100px;">
-                    <div class="card-header bg-primary text-white py-3">
-                        <h5 class="mb-0">สรุปคำสั่งซื้อ (Order Summary)</h5>
-                    </div>
-                    <div class="card-body p-4">
-                        <div class="d-flex justify-content-between mb-3">
-                            <span class="text-muted">ยอดรวมสินค้า</span>
-                            <span class="fw-bold">@totalAmount.ToString("N2") ฿</span>
-                        </div>
-                        <div class="d-flex justify-content-between mb-3">
-                            <span class="text-muted">ส่วนลด (ยังไม่คำนวณ)</span>
-                            <span class="text-danger">- 0.00 ฿</span>
-                        </div>
-                        <div class="d-flex justify-content-between mb-3">
-                            <span class="text-muted">ค่าจัดส่ง</span>
-                            <span>คำนวณในขั้นตอนถัดไป</span>
-                        </div>
-                        <hr>
-                        <div class="d-flex justify-content-between mb-4">
-                            <h5 class="fw-bold mb-0">ยอดสุทธิ (Net Total)</h5>
-                            <h4 class="fw-bold text-success mb-0">@totalAmount.ToString("N2") ฿</h4>
-                        </div>
+            <div class="d-flex justify-content-between mb-3">
+              <span class="text-muted">ส่วนลด (ยังไม่คำนวณ)</span>
+              <span class="text-danger">- 0.00 ฿</span>
+            </div>
+            <div class="d-flex justify-content-between mb-3">
+              <span class="text-muted">ค่าจัดส่ง</span>
+              <span>คำนวณในขั้นตอนถัดไป</span>
+            </div>
+            <hr>
+            <div class="d-flex justify-content-between mb-4">
+              <h5 class="fw-bold mb-0">ยอดสุทธิ (Net Total)</h5>
+              <h4 class="fw-bold text-success mb-0">@totalAmount.ToString("N2") ฿</h4>
+            </div>
                         
-                        <div class="d-grid gap-2">
-                            <a href="/Order/Checkout" class="btn btn-success btn-lg">
-                                ดำเนินการชำระเงิน <i class="fa-solid fa-arrow-right ms-2"></i>
-                            </a>
-                            <a href="/" class="btn btn-outline-secondary">เลือกซื้อสินค้าต่อ</a>
-                        </div>
-                    </div>
-                </div>
+            <div class="d-grid gap-2">
+              <a href="/Order/Checkout" class="btn btn-success btn-lg">
+                ดำเนินการชำระเงิน <i class="fa-solid fa-arrow-right ms-2"></i>
+              </a>
+              <a href="/" class="btn btn-outline-secondary">เลือกซื้อสินค้าต่อ</a>
             </div>
+          </div>
         </div>
-    }
-    else
-    {
-        <div class="card border-0 shadow-sm text-center py-5">
-            <div class="card-body">
-                <i class="fa-solid fa-basket-shopping text-muted mb-3" style="font-size: 4rem;"></i>
-                <h4 class="text-muted">ตะกร้าสินค้าของคุณว่างเปล่า</h4>
-                <p class="text-muted">คุณยังไม่ได้เพิ่มสินค้าใดๆ ลงในตะกร้าเลย ไปช้อปปิ้งกันเถอะ!</p>
-                <a href="/" class="btn btn-primary mt-3 px-4 py-2">เลือกซื้อสินค้า</a>
-            </div>
-        </div>
-    }
+      </div>
+    </div>
+  }
+  else
+  {
+    <div class="card border-0 shadow-sm text-center py-5">
+      <div class="card-body">
+        <i class="fa-solid fa-basket-shopping text-muted mb-3" style="font-size: 4rem;"></i>
+        <h4 class="text-muted">ตะกร้าสินค้าของคุณว่างเปล่า</h4>
+        <p class="text-muted">คุณยังไม่ได้เพิ่มสินค้าใดๆ ลงในตะกร้าเลย ไปช้อปปิ้งกันเถอะ!</p>
+        <a href="/" class="btn btn-primary mt-3 px-4 py-2">เลือกซื้อสินค้า</a>
+      </div>
+    </div>
+  }
 </div>
