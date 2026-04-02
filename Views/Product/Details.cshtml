@@ -1,94 +1,141 @@
 @model Stepify.Models.Db.Product
 @{
-    Layout = "_Layout";
-    ViewData["Title"] = Model.Name;
+  Layout = "_Layout";
+  ViewData["Title"] = Model.Name;
     
-    // รับค่ามาจาก ViewBag
-    var images = ViewBag.Images as List<Stepify.Models.Db.ProductImage>;
-    var variants = ViewBag.Variants as List<Stepify.Models.Db.ProductVariant>;
+  // รับค่ามาจาก ViewBag
+  var images = ViewBag.Images as List<Stepify.Models.Db.ProductImage>;
+  var variants = ViewBag.Variants as List<Stepify.Models.Db.ProductVariant>;
 }
 
 <div class="container mt-4 mb-5">
-    <nav aria-label="breadcrumb">
-        <ol class="breadcrumb">
-            <li class="breadcrumb-item"><a asp-controller="Home" asp-action="Index">หน้าแรก</a></li>
-            <li class="breadcrumb-item active" aria-current="page">@Model.Name</li>
-        </ol>
-    </nav>
+  <nav aria-label="breadcrumb">
+    <ol class="breadcrumb">
+      <li class="breadcrumb-item"><a asp-controller="Home" asp-action="Index">หน้าแรก</a></li>
+      <li class="breadcrumb-item active" aria-current="page">@Model.Name</li>
+    </ol>
+  </nav>
 
-    <div class="row gx-5">
-        <div class="col-md-6">
-            <div class="card border-0 shadow-sm mb-3">
-                <img id="mainImage" src="@(images != null && images.Any() ? images.First().ImageUrl : "https://via.placeholder.com/600x600?text=No+Image")" 
-                     class="card-img-top p-4" alt="@Model.Name" style="height: 500px; object-fit: contain;">
-            </div>
+  <div class="row gx-5">
+    <div class="col-md-6">
+      <div class="card border-0 shadow-sm mb-3">
+        <img id="mainImage"
+             src="@(images != null && images.Any() ? images.First().ImageUrl : "https://via.placeholder.com/600x600?text=No+Image")"
+             class="card-img-top p-4" alt="@Model.Name" style="height: 500px; object-fit: contain;">
+      </div>
             
-            @if (images != null && images.Count > 1)
-            {
-                <div class="d-flex gap-2 overflow-auto py-2">
-                    @foreach (var img in images)
-                    {
-                        <img src="@img.ImageUrl" class="img-thumbnail thumbnail-btn" style="width: 80px; height: 80px; object-fit: cover; cursor: pointer;" onclick="changeMainImage('@img.ImageUrl')" />
-                    }
-                </div>
-            }
+      @if (images != null && images.Count > 1)
+      {
+        <div class="d-flex gap-2 overflow-auto py-2">
+          @foreach (var img in images)
+          {
+            <img src="@img.ImageUrl" class="img-thumbnail thumbnail-btn"
+                 style="width: 80px; height: 80px; object-fit: cover; cursor: pointer;"
+                 onclick="changeMainImage('@img.ImageUrl')" />
+          }
         </div>
-
-        <div class="col-md-6">
-            <span class="badge bg-secondary mb-2 fs-6">@Model.Brand</span>
-            <h1 class="display-6 fw-bold mb-3">@Model.Name</h1>
-            
-            <h2 class="text-success fw-bold mb-4">@Model.Price.ToString("N2") ฿</h2>
-            
-            <p class="text-muted" style="white-space: pre-wrap;">@Model.Description</p>
-            <hr class="my-4">
-
-            <form asp-controller="Cart" asp-action="AddToCart" method="post">
-                
-                <div class="mb-4">
-                    <label class="form-label fw-bold">เลือกไซส์ (Size):</label>
-                    @if (variants != null && variants.Any())
-                    {
-                        <div class="d-flex gap-2 flex-wrap">
-                            @foreach (var v in variants)
-                            {
-                                <input type="radio" class="btn-check" name="VariantId" id="variant_@v.VariantId" value="@v.VariantId" autocomplete="off" required>
-                                <label class="btn btn-outline-dark px-4" for="variant_@v.VariantId">
-                                    @v.Size <br><small style="font-size:0.7rem;">(เหลือ @v.StockQty คู่)</small>
-                                </label>
-                            }
-                        </div>
-                    }
-                    else
-                    {
-                        <div class="alert alert-warning p-2">สินค้าหมดชั่วคราว (Out of Stock)</div>
-                    }
-                </div>
-
-                <div class="d-grid gap-2">
-                    @if (variants != null && variants.Any())
-                    {
-                        <button type="submit" class="btn btn-primary btn-lg">
-                            <i class="fa-solid fa-cart-plus me-2"></i> เพิ่มลงตะกร้า
-                        </button>
-                    }
-                    else
-                    {
-                        <button type="button" class="btn btn-secondary btn-lg" disabled>
-                            สินค้าหมด
-                        </button>
-                    }
-                </div>
-            </form>
-
-        </div>
+      }
     </div>
+
+    <div class="col-md-6">
+      <span class="badge bg-secondary mb-2 fs-6">@Model.Brand</span>
+      <h1 class="display-6 fw-bold mb-3">@Model.Name</h1>
+            
+      <h2 class="text-success fw-bold mb-4">@Model.Price.ToString("N2") ฿</h2>
+            
+      <p class="text-muted" style="white-space: pre-wrap;">@Model.Description</p>
+      <hr class="my-4">
+
+      <form asp-controller="Cart" asp-action="AddToCart" method="post">
+                
+        <div class="mb-4">
+          <label class="form-label fw-bold">เลือกไซส์ (Size):</label>
+          @if (variants != null && variants.Any())
+          {
+            <div class="d-flex gap-2 flex-wrap">
+              @foreach (var v in variants)
+              {
+                <input type="radio" class="btn-check" name="VariantId" id="variant_@v.VariantId" value="@v.VariantId"
+                       autocomplete="off" required>
+                <label class="btn btn-outline-dark px-4" for="variant_@v.VariantId">
+                  @v.Size <br><small style="font-size:0.7rem;">(เหลือ @v.StockQty คู่)</small>
+                </label>
+              }
+            </div>
+          }
+          else
+          {
+            <div class="alert alert-warning p-2">สินค้าหมดชั่วคราว (Out of Stock)</div>
+          }
+        </div>
+
+        <div class="d-grid gap-2">
+          @if (variants != null && variants.Any())
+          {
+            <button type="submit" class="btn btn-primary btn-lg">
+              <i class="fa-solid fa-cart-plus me-2"></i> เพิ่มลงตะกร้า
+            </button>
+          }
+          else
+          {
+            <button type="button" class="btn btn-secondary btn-lg" disabled>
+              สินค้าหมด
+            </button>
+          }
+        </div>
+      </form>
+
+      @if (ViewBag.HasPurchased != null && (bool)ViewBag.HasPurchased == true)
+      {
+        <div class="card border-0 shadow-sm border-top border-warning border-4 mt-4 mb-5 bg-light">
+          <div class="card-body p-4">
+            <h5 class="fw-bold mb-3"><i class="fa-solid fa-pen-to-square text-warning me-2"></i> เขียนรีวิวสินค้านี้</h5>
+            
+            @if (TempData["SuccessMsg"] != null)
+            {
+              <div class="alert alert-success"><i class="fa-solid fa-circle-check"></i> @TempData["SuccessMsg"]</div>
+            }
+            @if (TempData["ErrorMsg"] != null)
+            {
+              <div class="alert alert-danger"><i class="fa-solid fa-circle-xmark"></i> @TempData["ErrorMsg"]</div>
+            }
+
+            <form asp-controller="Product" asp-action="AddReview" method="post">
+              <input type="hidden" name="ProductId" value="@Model.ProductId" />
+                
+              <div class="mb-3">
+                <label class="form-label fw-bold">ให้คะแนนความพึงพอใจ</label>
+                <select name="Rating" class="form-select border-warning" required>
+                  <option value="5">⭐⭐⭐⭐⭐ (5/5 ยอดเยี่ยม)</option>
+                  <option value="4">⭐⭐⭐⭐ (4/5 ดีมาก)</option>
+                  <option value="3">⭐⭐⭐ (3/5 ปานกลาง)</option>
+                  <option value="2">⭐⭐ (2/5 พอใช้)</option>
+                  <option value="1">⭐ (1/5 ต้องปรับปรุง)</option>
+                </select>
+              </div>
+                
+              <div class="mb-3">
+                <label class="form-label fw-bold">ความคิดเห็นของคุณ</label>
+                <textarea name="Comment" class="form-control" rows="3"
+                          placeholder="แชร์ความรู้สึกหลังจากใช้งานสินค้านี้..." required></textarea>
+              </div>
+                
+              <button type="submit" class="btn btn-warning fw-bold text-dark px-4 shadow-sm">
+                <i class="fa-solid fa-gift me-1"></i> ส่งรีวิว & รับคูปอง 100 บาท
+              </button>
+            </form>
+          </div>
+        </div>
+      }
+
+    </div>
+  </div>
 </div>
 
 @section Scripts {
-    <script>
-        function changeMainImage(url) {
-            document.getElementById('mainImage').src = url;
-        }
-    </script>
+  <script>
+    function changeMainImage(url) {
+      document.getElementById('mainImage').src = url;
+    }
+  </script>
 }
