@@ -5,7 +5,12 @@
 /* ===== Admin Sidebar ===== */
 .admin-sidebar {
     background: linear-gradient(180deg, var(--neutral-900) 0%, var(--neutral-800) 100%);
-    min-height: 100vh;
+    
+    /* 🌟 เปลี่ยนจาก min-height: 100vh; เป็น height และเพิ่ม position sticky */
+    height: 100vh;
+    position: sticky;
+    top: 0;
+    
     width: 280px;
     padding: 1.5rem;
     display: flex;

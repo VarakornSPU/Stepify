@@ -468,7 +468,7 @@ namespace Stepify.Controllers
             return View(promos);
         }
 
-       // ==========================================
+        // ==========================================
         // 18. ฟังก์ชันเพิ่มโปรโมชั่นใหม่ (POST)
         // ==========================================
         [HttpPost]
@@ -492,8 +492,8 @@ namespace Stepify.Controllers
             }
 
             // บังคับให้โปรโมชั่นที่สร้างใหม่ เปิดใช้งานทันที
-            data.IsActive = true; 
-            
+            data.IsActive = true;
+
             _db.Promotions.Add(data);
             _db.SaveChanges();
 
@@ -530,6 +530,34 @@ namespace Stepify.Controllers
                 _db.SaveChanges();
             }
             return RedirectToAction("ManagePromotions");
+        }
+
+        // ==========================================
+        // 21. หน้าจัดการรายการแจ้งปัญหา (Manage Issues)
+        // ==========================================
+        [Authorize(Roles = "Admin")]
+        public IActionResult ManageIssues()
+        {
+            // ดึงข้อมูลการแจ้งปัญหาเรียงจากใหม่สุดไปเก่าสุด
+            var issues = _db.IssueReports.OrderByDescending(i => i.CreatedAt).ToList();
+            return View(issues);
+        }
+
+        // ==========================================
+        // 22. อัปเดตสถานะการแจ้งปัญหา (Mark as Resolved)
+        // ==========================================
+        [HttpPost]
+        [Authorize(Roles = "Admin")]
+        public IActionResult UpdateIssueStatus(int id, string status)
+        {
+            var issue = _db.IssueReports.FirstOrDefault(i => i.IssueId == id);
+            if (issue != null)
+            {
+                issue.Status = status; // เช่น เปลี่ยนจาก "Pending" เป็น "Resolved"
+                _db.IssueReports.Update(issue);
+                _db.SaveChanges();
+            }
+            return RedirectToAction("ManageIssues");
         }
     }
 }

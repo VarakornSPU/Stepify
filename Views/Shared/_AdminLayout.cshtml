@@ -97,6 +97,13 @@
                         </a>
                     </li>
                 </ul>
+                <li class="nav-item">
+                    <a asp-controller="Admin" asp-action="ManageIssues"
+                           class="nav-link @(ViewContext.RouteData.Values["Action"]?.ToString() == "ManageIssues" ? "active" : "")">
+                        <i class="fa-solid fa-triangle-exclamation"></i>
+                        <span>รายการแจ้งปัญหา</span>
+                    </a>
+                </li>
             </nav>
             
             <!-- User Profile -->
