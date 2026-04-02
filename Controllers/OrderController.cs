@@ -198,9 +198,72 @@ namespace Stepify.Controllers
 
     public IActionResult Success(int orderId) { ViewBag.OrderId = orderId; return View(); }
 
+    // ==========================================
+    // ประวัติการสั่งซื้อ (พร้อมระบบเช็ค Auto-Complete 7 วัน)
+    // ==========================================
     public IActionResult History()
     {
-      return View(_db.Orders.Where(o => o.UserId == int.Parse(User.FindFirst("UserId").Value)).OrderByDescending(o => o.OrderDate).ToList());
+      int currentUserId = int.Parse(User.FindFirst("UserId").Value);
+      var orders = _db.Orders.Where(o => o.UserId == currentUserId)
+                             .OrderByDescending(o => o.OrderDate)
+                             .ToList();
+
+      bool hasChanges = false;
+      var today = DateTime.Now;
+
+      // ลูปเช็คออเดอร์ทั้งหมดของลูกค้าคนนี้
+      foreach (var order in orders)
+      {
+        // ถ้าสถานะเป็น "Shipped" (กำลังจัดส่ง) และผ่านมาแล้ว 7 วันนับจากวันที่สั่งซื้อ
+        if (order.ShippingStatus == "Shipped" && order.OrderDate.HasValue && today > order.OrderDate.Value.AddDays(7))
+        {
+          order.ShippingStatus = "Completed";
+
+          // หากเป็นเก็บเงินปลายทาง (COD) เมื่อสถานะ Completed ถือว่าลูกค้าจ่ายเงินแล้ว
+          if (order.PaymentStatus == "Pending")
+          {
+            order.PaymentStatus = "Paid";
+          }
+
+          _db.Orders.Update(order);
+          hasChanges = true;
+        }
+      }
+
+      // ถ้ามีการอัปเดตสถานะอัตโนมัติ ให้เซฟลงฐานข้อมูล
+      if (hasChanges)
+      {
+        _db.SaveChanges();
+      }
+
+      return View(orders);
+    }
+
+    // ==========================================
+    // ฟังก์ชันสำหรับให้ลูกค้ากด "ได้รับสินค้าแล้ว" ด้วยตัวเอง
+    // ==========================================
+    [HttpPost]
+    public IActionResult ConfirmReceive(int orderId)
+    {
+      int currentUserId = int.Parse(User.FindFirst("UserId").Value);
+      // ค้นหาบิลและเช็คเพื่อความปลอดภัยว่าบิลนี้เป็นของคนที่ Login อยู่จริงๆ
+      var order = _db.Orders.FirstOrDefault(o => o.OrderId == orderId && o.UserId == currentUserId);
+
+      if (order != null && order.ShippingStatus == "Shipped")
+      {
+        order.ShippingStatus = "Completed";
+
+        // กรณีลูกค้าจ่ายแบบ COD ให้ปรับสถานะเงินเป็น Paid ด้วย
+        if (order.PaymentStatus == "Pending")
+        {
+          order.PaymentStatus = "Paid";
+        }
+
+        _db.Orders.Update(order);
+        _db.SaveChanges();
+      }
+
+      return RedirectToAction("History"); // กลับไปหน้าประวัติการสั่งซื้อ
     }
 
     public IActionResult Details(int id)
@@ -221,24 +284,24 @@ namespace Stepify.Controllers
     [HttpPost]
     public IActionResult UpdateProfileAddress(string newAddress)
     {
-        try 
+      try
+      {
+        int currentUserId = int.Parse(User.FindFirst("UserId").Value);
+        var user = _db.Users.FirstOrDefault(u => u.UserId == currentUserId);
+
+        if (user != null)
         {
-            int currentUserId = int.Parse(User.FindFirst("UserId").Value);
-            var user = _db.Users.FirstOrDefault(u => u.UserId == currentUserId);
-            
-            if (user != null)
-            {
-                user.Address = newAddress;
-                _db.Users.Update(user);
-                _db.SaveChanges();
-                return Json(new { success = true });
-            }
-            return Json(new { success = false, message = "ไม่พบข้อมูลผู้ใช้" });
+          user.Address = newAddress;
+          _db.Users.Update(user);
+          _db.SaveChanges();
+          return Json(new { success = true });
         }
-        catch (Exception ex)
-        {
-            return Json(new { success = false, message = ex.Message });
-        }
+        return Json(new { success = false, message = "ไม่พบข้อมูลผู้ใช้" });
+      }
+      catch (Exception ex)
+      {
+        return Json(new { success = false, message = ex.Message });
+      }
     }
   }
 }

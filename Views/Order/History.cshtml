@@ -31,14 +31,44 @@
                                 <td class="fw-bold text-success">@order.NetAmount.ToString("N2") ฿</td>
                                 <td>
                                     @if(order.PaymentStatus == "Pending") { <span class="badge bg-warning text-dark">รอชำระเงิน</span> }
+                                    else if(order.PaymentStatus == "Paid") { <span class="badge bg-success">ชำระเงินแล้ว</span> }
                                     else { <span class="badge bg-success">@order.PaymentStatus</span> }
                                 </td>
+                                
                                 <td>
-                                    @if(order.ShippingStatus == "Packing") { <span class="badge bg-secondary">กำลังจัดเตรียม</span> }
-                                    else { <span class="badge bg-info">@order.ShippingStatus</span> }
+                                    @if(order.ShippingStatus == "Packing") 
+                                    { 
+                                        <span class="badge bg-secondary">กำลังจัดเตรียม</span> 
+                                    }
+                                    else if(order.ShippingStatus == "Shipped") 
+                                    { 
+                                        <span class="badge bg-info"><i class="fa-solid fa-truck-fast me-1"></i>กำลังจัดส่ง</span> 
+                                    }
+                                    else if(order.ShippingStatus == "Completed") 
+                                    { 
+                                        <span class="badge bg-success"><i class="fa-solid fa-box-open me-1"></i>ได้รับสินค้าแล้ว</span> 
+                                    }
+                                    else 
+                                    { 
+                                        <span class="badge bg-secondary">@order.ShippingStatus</span> 
+                                    }
                                 </td>
+                                
                                 <td class="text-center pe-4">
-                                    <a asp-action="Details" asp-route-id="@order.OrderId" class="btn btn-sm btn-outline-primary">ดูรายละเอียด</a>
+                                    <div class="d-flex justify-content-center gap-2">
+                                        <a asp-action="Details" asp-route-id="@order.OrderId" class="btn btn-sm btn-outline-primary">ดูรายละเอียด</a>
+                                        
+                                        @if (order.ShippingStatus == "Shipped")
+                                        {
+                                            <form asp-controller="Order" asp-action="ConfirmReceive" method="post" class="d-inline">
+                                                <input type="hidden" name="orderId" value="@order.OrderId" />
+                                                <button type="submit" class="btn btn-sm btn-success shadow-sm" 
+                                                        onclick="return confirm('คุณได้รับสินค้าและตรวจสอบความเรียบร้อยแล้วใช่หรือไม่?');">
+                                                    <i class="fa-solid fa-check me-1"></i> ได้รับสินค้า
+                                                </button>
+                                            </form>
+                                        }
+                                    </div>
                                 </td>
                             </tr>
                         }

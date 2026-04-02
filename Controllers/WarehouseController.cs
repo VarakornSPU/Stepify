@@ -66,7 +66,8 @@ namespace Stepify.Controllers
       var orders = _db.Orders
           .Where(o => (o.PaymentStatus == "Paid" || (o.PaymentStatus == "Pending" && o.ShippingStatus == "Packing"))
                       && o.ShippingStatus != "Delivered"
-                      && o.ShippingStatus != "Cancelled")
+                      && o.ShippingStatus != "Cancelled"
+                      & o.ShippingStatus != "Completed")
           .OrderBy(o => o.OrderDate)
           .ToList();
 
