@@ -135,7 +135,10 @@ namespace Stepify.Controllers
       return RedirectToAction("Details", new { id = ProductId });
     }
 
-    public IActionResult AllProducts(string brand, string sort)
+// ==========================================
+    // หน้ารวมสินค้าทั้งหมด (พร้อมระบบค้นหา, กรองแบรนด์, เรียงราคา)
+    // ==========================================
+    public IActionResult AllProducts(string searchKeyword, string brand, string sort)
     {
       // ดึงสินค้าพร้อมรูปหลัก เหมือนหน้า Home
       var productsQuery = (from p in _db.Products
@@ -151,13 +154,19 @@ namespace Stepify.Controllers
                              p.Description
                            }).AsQueryable();
 
-      // ระบบ Filter
+      // 🌟 1. ระบบ Search (ค้นหาด้วยการพิมพ์ชื่อ หรือ แบรนด์)
+      if (!string.IsNullOrEmpty(searchKeyword))
+      {
+          productsQuery = productsQuery.Where(p => p.Name.Contains(searchKeyword) || p.Brand.Contains(searchKeyword));
+      }
+
+      // 🌟 2. ระบบ Filter (กรองด้วยแบรนด์)
       if (!string.IsNullOrEmpty(brand))
       {
         productsQuery = productsQuery.Where(p => p.Brand == brand);
       }
 
-      // ระบบ Sort
+      // 🌟 3. ระบบ Sort (เรียงลำดับราคา)
       productsQuery = sort switch
       {
         "price_asc" => productsQuery.OrderBy(p => p.Price),
@@ -165,9 +174,11 @@ namespace Stepify.Controllers
         _ => productsQuery.OrderByDescending(p => p.ProductId)
       };
 
+      // ส่งข้อมูลไปวาดตัวเลือกที่หน้า View
       ViewBag.Brands = _db.Products.Select(p => p.Brand).Distinct().ToList();
       ViewBag.SelectedBrand = brand;
       ViewBag.SelectedSort = sort;
+      ViewBag.SearchKeyword = searchKeyword; // ส่งคำที่ค้นหากลับไปแสดงโชว์ในช่องค้นหา
 
       return View(productsQuery.ToList());
     }

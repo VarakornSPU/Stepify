@@ -58,133 +58,132 @@
                     </ul>
 
                     <!-- Search Form -->
-                    <form class="search-form-wrapper d-flex me-3" asp-controller="Home" asp-action="Search"
-                          method="get">
-                        <input class="form-control" type="search" name="keyword" placeholder="ค้นหารองเท้า..."
-                               aria-label="Search">
-                        <button class="btn btn-search" type="submit">
-                            <i class="fa-solid fa-magnifying-glass"></i>
-                        </button>
-                    </form>
+                    <form asp-controller="Product" asp-action="AllProducts" method="get" class="d-flex ms-auto me-3">
+                        <input class="form-control me-2" type="search" name="searchKeyword"
+                               value="@ViewBag.SearchKeyword" placeholder="ค้นหารองเท้า..." aria-label="Search">
+                        <button class="btn btn-outline-primary" type="submit"><i
+                            class="fa-solid fa-magnifying-glass"></i></button>
+                        </form>
 
-                    <!-- Right Navigation -->
-                    <ul class="navbar-nav align-items-center">
-                        <!-- Cart -->
-                        <li class="nav-item me-2">
-                            <a class="nav-link position-relative" asp-controller="Cart" asp-action="Index">
-                                <i class="fa-solid fa-cart-shopping"></i>
-                                @* เรียกใช้ ViewComponent ที่เราสร้างไว้ *@
-                                @await Component.InvokeAsync("CartBadge")
-                            </a>
-                        </li>
-
-                        @if (User.Identity != null && User.Identity.IsAuthenticated)
-                        {
-                            <!-- User Dropdown -->
-                            <li class="nav-item dropdown user-dropdown">
-                                <a class="nav-link dropdown-toggle" href="#" id="userDropdown" role="button"
-                                       data-bs-toggle="dropdown" aria-expanded="false">
-                                    <i class="fa-solid fa-circle-user me-1"></i>
-                                    @User.Identity.Name
-                                </a>
-                                <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="userDropdown">
-                                    <li>
-                                        <a class="dropdown-item" asp-controller="Auth" asp-action="Profile">
-                                            <i class="fa-solid fa-user me-2"></i> โปรไฟล์ของฉัน
-                                        </a>
-                                    </li>
-                                    <li>
-                                        <a class="dropdown-item" asp-controller="Order" asp-action="History">
-                                            <i class="fa-solid fa-box-open me-2"></i> ประวัติการสั่งซื้อ
-                                        </a>
-                                    </li>
-
-                                    @if (User.IsInRole("Admin"))
-                                    {
-                                        <li>
-                                            <hr class="dropdown-divider">
-                                        </li>
-                                        <li>
-                                            <a class="dropdown-item fw-bold text-primary" asp-controller="Admin"
-                                                   asp-action="Index">
-                                                <i class="fa-solid fa-gauge-high me-2"></i> จัดการระบบ (Admin)
-                                            </a>
-                                        </li>
-                                    }
-    
-                                    @if (User.IsInRole("Warehouse"))
-                                    {
-                                        <li>
-                                            <hr class="dropdown-divider">
-                                        </li>
-                                        <li>
-                                            @* 🌟 แก้คลาสเป็น dropdown-item เหมือนอันอื่นๆ *@
-                                            <a class="dropdown-item fw-bold text-success" asp-controller="Warehouse" asp-action="ManageStock">
-                                                <i class="fa-solid fa-boxes-stacked me-2"></i> จัดการคลังสินค้า
-                                            </a>
-                                        </li>
-                                    }
-
-                                    <li>
-                                        <hr class="dropdown-divider">
-                                    </li>
-                                    <li>
-                                        <a class="dropdown-item text-danger" asp-controller="Auth" asp-action="Logout">
-                                            <i class="fa-solid fa-right-from-bracket me-2"></i> ออกจากระบบ
-                                        </a>
-                                    </li>
-                                </ul>
-                            </li>
-                        }
-                        else
-                        {
-                            <!-- Auth Buttons -->
+                        <!-- Right Navigation -->
+                        <ul class="navbar-nav align-items-center">
+                            <!-- Cart -->
                             <li class="nav-item me-2">
-                                <a class="btn btn-auth-login" asp-controller="Auth" asp-action="Login">
-                                    เข้าสู่ระบบ
+                                <a class="nav-link position-relative" asp-controller="Cart" asp-action="Index">
+                                    <i class="fa-solid fa-cart-shopping"></i>
+                                    @* เรียกใช้ ViewComponent ที่เราสร้างไว้ *@
+                                    @await Component.InvokeAsync("CartBadge")
                                 </a>
                             </li>
-                            <li class="nav-item">
-                                <a class="btn btn-auth-register" asp-controller="Auth" asp-action="Register">
-                                    สมัครสมาชิก
-                                </a>
-                            </li>
-                        }
-                    </ul>
-                </div>
-            </div>
-        </nav>
-    </header>
 
-    <div class="container py-4">
-        <main role="main">
-            @RenderBody()
-        </main>
-    </div>
+                            @if (User.Identity != null && User.Identity.IsAuthenticated)
+                            {
+                                <!-- User Dropdown -->
+                                <li class="nav-item dropdown user-dropdown">
+                                    <a class="nav-link dropdown-toggle" href="#" id="userDropdown" role="button"
+                                           data-bs-toggle="dropdown" aria-expanded="false">
+                                        <i class="fa-solid fa-circle-user me-1"></i>
+                                        @User.Identity.Name
+                                    </a>
+                                    <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="userDropdown">
+                                        <li>
+                                            <a class="dropdown-item" asp-controller="Auth" asp-action="Profile">
+                                                <i class="fa-solid fa-user me-2"></i> โปรไฟล์ของฉัน
+                                            </a>
+                                        </li>
+                                        <li>
+                                            <a class="dropdown-item" asp-controller="Order" asp-action="History">
+                                                <i class="fa-solid fa-box-open me-2"></i> ประวัติการสั่งซื้อ
+                                            </a>
+                                        </li>
 
-    <footer class="footer-stepify">
-        <div class="container">
-            <div class="row align-items-center">
-                <div class="col-md-6 text-center text-md-start mb-3 mb-md-0">
-                    <div class="footer-brand">
-                        <i class="fa-solid fa-shoe-prints"></i>
-                        <span>Stepify</span>
+                                        @if (User.IsInRole("Admin"))
+                                        {
+                                            <li>
+                                                <hr class="dropdown-divider">
+                                            </li>
+                                            <li>
+                                                <a class="dropdown-item fw-bold text-primary" asp-controller="Admin"
+                                                       asp-action="Index">
+                                                    <i class="fa-solid fa-gauge-high me-2"></i> จัดการระบบ (Admin)
+                                                </a>
+                                            </li>
+                                        }
+    
+                                        @if (User.IsInRole("Warehouse"))
+                                        {
+                                            <li>
+                                                <hr class="dropdown-divider">
+                                            </li>
+                                            <li>
+                                                @* 🌟 แก้คลาสเป็น dropdown-item เหมือนอันอื่นๆ *@
+                                                <a class="dropdown-item fw-bold text-success" asp-controller="Warehouse"
+                                                       asp-action="ManageStock">
+                                                    <i class="fa-solid fa-boxes-stacked me-2"></i> จัดการคลังสินค้า
+                                                </a>
+                                            </li>
+                                        }
+
+                                        <li>
+                                            <hr class="dropdown-divider">
+                                        </li>
+                                        <li>
+                                            <a class="dropdown-item text-danger" asp-controller="Auth" asp-action="Logout">
+                                                <i class="fa-solid fa-right-from-bracket me-2"></i> ออกจากระบบ
+                                            </a>
+                                        </li>
+                                    </ul>
+                                </li>
+                            }
+                            else
+                            {
+                                <!-- Auth Buttons -->
+                                <li class="nav-item me-2">
+                                    <a class="btn btn-auth-login" asp-controller="Auth" asp-action="Login">
+                                        เข้าสู่ระบบ
+                                    </a>
+                                </li>
+                                <li class="nav-item">
+                                    <a class="btn btn-auth-register" asp-controller="Auth" asp-action="Register">
+                                        สมัครสมาชิก
+                                    </a>
+                                </li>
+                            }
+                        </ul>
                     </div>
-                    <p class="mb-0 small">Premium Sneaker Store - Step Into Your Style</p>
                 </div>
-                <div class="col-md-6 text-center text-md-end">
-                    <p class="mb-0 small">
-                        &copy; 2026 Stepify. All rights reserved. |
-                        <a asp-area="" asp-controller="Home" asp-action="Privacy">Privacy Policy</a>
-                    </p>
+            </nav>
+        </header>
+
+        <div class="container py-4">
+            <main role="main">
+                @RenderBody()
+            </main>
+        </div>
+
+        <footer class="footer-stepify">
+            <div class="container">
+                <div class="row align-items-center">
+                    <div class="col-md-6 text-center text-md-start mb-3 mb-md-0">
+                        <div class="footer-brand">
+                            <i class="fa-solid fa-shoe-prints"></i>
+                            <span>Stepify</span>
+                        </div>
+                        <p class="mb-0 small">Premium Sneaker Store - Step Into Your Style</p>
+                    </div>
+                    <div class="col-md-6 text-center text-md-end">
+                        <p class="mb-0 small">
+                            &copy; 2026 Stepify. All rights reserved. |
+                            <a asp-area="" asp-controller="Home" asp-action="Privacy">Privacy Policy</a>
+                        </p>
+                    </div>
                 </div>
             </div>
-        </div>
-    </footer>
+        </footer>
 
-    <script src="~/lib/jquery/dist/jquery.min.js"></script>
-    <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
-    @await RenderSectionAsync("Scripts", required: false)
-</body>
+        <script src="~/lib/jquery/dist/jquery.min.js"></script>
+        <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
+        @await RenderSectionAsync("Scripts", required: false)
+    </body>
 
 </html>
