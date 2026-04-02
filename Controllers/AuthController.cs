@@ -6,6 +6,7 @@ using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authentication.Cookies;
 using System.Threading.Tasks;
 using System.Collections.Generic;
+using Microsoft.AspNetCore.Authorization;
 
 namespace Stepify.Controllers
 {
@@ -47,6 +48,21 @@ namespace Stepify.Controllers
             };
 
             _db.Users.Add(newUser);
+            _db.SaveChanges();
+
+            // ===================================================
+            // 🌟 แจกคูปอง "สมาชิกใหม่" ทันที 10% (ใช้ได้ 1 ครั้ง)
+            // ===================================================
+            // 🌟 แจกคูปองสมาชิกใหม่ 10% ให้ทันที!
+            var welcomeVoucher = new UserVoucher
+            {
+                UserId = newUser.UserId,
+                VoucherType = "คูปองต้อนรับสมาชิกใหม่ (ลด 10%)",
+                DiscountValue = 10,
+                IsPercent = true,
+                IsUsed = false
+            };
+            _db.UserVouchers.Add(welcomeVoucher);
             _db.SaveChanges();
 
             return RedirectToAction("Login");
@@ -92,7 +108,7 @@ namespace Stepify.Controllers
                 // {
                 //     return RedirectToAction("Index", "Warehouse"); // เผื่ออนาคต
                 // }
-                
+
                 return RedirectToAction("Index", "Home");
             }
 
@@ -107,6 +123,68 @@ namespace Stepify.Controllers
         {
             await HttpContext.SignOutAsync(CookieAuthenticationDefaults.AuthenticationScheme);
             return RedirectToAction("Index", "Home");
+        }
+
+        // ==========================================
+        // หน้าโปรไฟล์ส่วนตัว (GET)
+        // ==========================================
+        [Authorize]
+        public IActionResult Profile()
+        {
+            // ดึง ID ของคนที่ล็อกอินอยู่
+            int currentUserId = int.Parse(User.FindFirst("UserId").Value);
+
+            // ดึงข้อมูลลูกค้าคนนั้นจากฐานข้อมูลส่งไปที่หน้าจอ
+            var user = _db.Users.FirstOrDefault(u => u.UserId == currentUserId);
+            return View(user);
+        }
+
+        // ==========================================
+        // 5. ฟังก์ชันอัปเดตโปรไฟล์ (POST)
+        // ==========================================
+        [HttpPost]
+        [Authorize]
+        // 🌟 1. เปลี่ยนเป็น async Task<IActionResult> 
+        public async Task<IActionResult> UpdateProfile(string Username, string Tel, string Address, string NewPassword)
+        {
+            int currentUserId = int.Parse(User.FindFirst("UserId").Value);
+            var user = _db.Users.FirstOrDefault(u => u.UserId == currentUserId);
+
+            if (user != null)
+            {
+                // อัปเดตข้อมูลลง Database
+                user.Username = Username;
+                user.Tel = Tel;
+                user.Address = Address;
+
+                if (!string.IsNullOrEmpty(NewPassword))
+                {
+                    user.Password = NewPassword;
+                }
+
+                _db.Users.Update(user);
+                _db.SaveChanges();
+
+                // ========================================================
+                // 🌟 2. สิ่งที่เพิ่มเข้ามา: อัปเดต Cookie ล็อกอินใหม่ทันที!
+                // ========================================================
+                var claims = new List<Claim>
+                {
+                    new Claim(ClaimTypes.Name, user.Username ?? ""), // อัปเดตชื่อใหม่ใส่ Cookie
+                    new Claim(ClaimTypes.Email, user.Email ?? ""),
+                    new Claim(ClaimTypes.Role, user.Role ?? "User"),
+                    new Claim("UserId", user.UserId.ToString())
+                };
+
+                var identity = new ClaimsIdentity(claims, CookieAuthenticationDefaults.AuthenticationScheme);
+                var principal = new ClaimsPrincipal(identity);
+
+                // สั่ง Sign in ทับของเดิม (เสมือนล็อกอินใหม่เงียบๆ หลังบ้าน)
+                await HttpContext.SignInAsync(CookieAuthenticationDefaults.AuthenticationScheme, principal);
+            }
+
+            TempData["SuccessMsg"] = "อัปเดตข้อมูลโปรไฟล์เรียบร้อยแล้ว";
+            return RedirectToAction("Profile");
         }
     }
 }

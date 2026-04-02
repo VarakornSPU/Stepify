@@ -18,4 +18,6 @@ public partial class Promotion
     public bool? IsPercent { get; set; }
 
     public bool? IsActive { get; set; }
+
+    public DateTime? ExpiryDate { get; set; }
 }

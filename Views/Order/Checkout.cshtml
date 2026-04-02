@@ -1,92 +1,239 @@
+@model IEnumerable<dynamic>
 @{
-    Layout = "_Layout";
     ViewData["Title"] = "ชำระเงิน (Checkout)";
-    var cartItems = ViewBag.CartItems as IEnumerable<dynamic>;
 }
 
-<div class="container mt-4 mb-5">
-    <h3 class="fw-bold mb-4">ดำเนินการชำระเงิน (Checkout)</h3>
-
-    <div class="row gx-5">
-        <div class="col-md-7">
+<div class="container my-5">
+    <div class="row">
+        <div class="col-md-7 mb-4">
+            <h4 class="fw-bold mb-3"><i class="fa-solid fa-location-dot text-danger"></i> ข้อมูลการจัดส่ง</h4>
             <div class="card border-0 shadow-sm mb-4">
-                <div class="card-header bg-white py-3">
-                    <h5 class="mb-0 fw-bold"><i class="fa-solid fa-location-dot text-primary"></i> ข้อมูลการจัดส่ง</h5>
-                </div>
                 <div class="card-body">
-                    <form id="checkoutForm" asp-controller="Order" asp-action="PlaceOrder" method="post">
-                        <input type="hidden" name="TotalAmount" value="@ViewBag.TotalAmount" />
-                        <input type="hidden" name="DiscountAmount" value="@ViewBag.DiscountAmount" />
-                        <input type="hidden" name="NetAmount" value="@ViewBag.NetAmount" />
+                    <form id="checkoutForm" asp-action="PlaceOrder" method="post">
+                        
+                        <div class="mb-3">
+                            <div class="d-flex justify-content-between align-items-center mb-2">
+                                <label class="form-label fw-bold mb-0">ที่อยู่จัดส่ง</label>
+                                <button type="button" class="btn btn-sm btn-outline-primary fw-bold" onclick="enableEditAddress()">
+                                    <i class="fa-solid fa-pen"></i> แก้ไขที่อยู่
+                                </button>
+                            </div>
+                            <textarea id="addressField" name="ShippingAddress" class="form-control bg-light" rows="3" required placeholder="กรุณากรอกที่อยู่จัดส่ง..." readonly>@ViewBag.UserAddress</textarea>
+                            <small class="text-muted"><i class="fa-solid fa-circle-info"></i> ดึงข้อมูลจากโปรไฟล์ กดแก้ไขหากต้องการเปลี่ยนที่อยู่สำหรับคำสั่งซื้อนี้</small>
+                        </div>
 
                         <div class="mb-3">
-                            <label class="form-label">ที่อยู่สำหรับจัดส่งอย่างละเอียด</label>
-                            <textarea class="form-control" name="ShippingAddress" rows="4" required placeholder="บ้านเลขที่, ซอย, ถนน, ตำบล, อำเภอ, จังหวัด, รหัสไปรษณีย์"></textarea>
+                            <label class="form-label fw-bold">ช่องทางการชำระเงิน</label>
+                            <select name="PaymentMethod" class="form-select" required>
+                                <option value="CreditCard">💳 บัตรเครดิต / เดบิต</option>
+                                <option value="BankTransfer">🏦 โอนเงินผ่านธนาคาร</option>
+                                <option value="COD">💵 เก็บเงินปลายทาง (COD)</option>
+                            </select>
                         </div>
 
-                        <h5 class="mb-3 mt-4 fw-bold"><i class="fa-solid fa-credit-card text-primary"></i> เลือกวิธีชำระเงิน</h5>
-                        <div class="form-check mb-2">
-                            <input class="form-check-input" type="radio" name="PaymentMethod" id="pay1" value="CreditCard" required>
-                            <label class="form-check-label" for="pay1">บัตรเครดิต / เดบิต</label>
-                        </div>
-                        <div class="form-check mb-2">
-                            <input class="form-check-input" type="radio" name="PaymentMethod" id="pay2" value="PromptPay">
-                            <label class="form-check-label" for="pay2">สแกน QR Code (พร้อมเพย์)</label>
-                        </div>
-                        <div class="form-check">
-                            <input class="form-check-input" type="radio" name="PaymentMethod" id="pay3" value="COD">
-                            <label class="form-check-label" for="pay3">เก็บเงินปลายทาง (COD)</label>
-                        </div>
+                        <input type="hidden" name="TotalAmount" value="@ViewBag.TotalAmount" />
+                        <input type="hidden" name="DiscountAmount" id="FormDiscountAmount" value="@ViewBag.AutoDiscountAmount" />
+                        <input type="hidden" name="NetAmount" id="FormNetAmount" value="@ViewBag.NetBeforeManualVoucher" />
+                        <input type="hidden" name="UsedVoucherId" id="FormUsedVoucherId" value="" />
+                        <input type="hidden" name="UsedPromotionId" id="FormUsedPromotionId" value="" />
+                        
+                        <button type="submit" class="btn btn-primary w-100 fw-bold mt-3 py-2">ยืนยันการสั่งซื้อ</button>
                     </form>
+                </div>
+            </div>
+
+            <h4 class="fw-bold mb-3">สินค้าในตะกร้า</h4>
+            <div class="card border-0 shadow-sm">
+                <div class="card-body p-0">
+                    <ul class="list-group list-group-flush">
+                        @foreach(var item in Model) {
+                            <li class="list-group-item d-flex justify-content-between align-items-center p-3">
+                                <div>
+                                    <h6 class="fw-bold mb-0">@item.Name</h6>
+                                    <small class="text-muted">Size: @item.Size | Color: @item.Color</small>
+                                </div>
+                                <div class="text-end">
+                                    <span class="badge bg-secondary rounded-pill me-2">x @item.Quantity</span>
+                                    <span class="fw-bold">@item.SubTotal.ToString("N0") ฿</span>
+                                </div>
+                            </li>
+                        }
+                    </ul>
                 </div>
             </div>
         </div>
 
         <div class="col-md-5">
-            <div class="card border-0 shadow-sm">
-                <div class="card-header bg-light py-3">
-                    <h5 class="mb-0 fw-bold">สรุปคำสั่งซื้อ</h5>
-                </div>
-                <div class="card-body">
-                    <ul class="list-group list-group-flush mb-3">
-                        @foreach (var item in cartItems)
-                        {
-                            <li class="list-group-item d-flex justify-content-between lh-sm px-0">
-                                <div>
-                                    <h6 class="my-0">@item.Name</h6>
-                                    <small class="text-muted">ไซส์: @item.Size (@item.Color) x @item.Quantity</small>
-                                </div>
-                                <span class="text-muted">@item.SubTotal.ToString("N2")</span>
-                            </li>
-                        }
-                    </ul>
-
-                    <form asp-controller="Order" asp-action="Checkout" method="get" class="card p-2 mb-3 bg-light border-0">
-                        <div class="input-group">
-                            <input type="text" class="form-control" name="promoCode" value="@ViewBag.PromoCode" placeholder="กรอกโค้ดส่วนลด">
-                            <button type="submit" class="btn btn-secondary">ใช้โค้ด</button>
-                        </div>
-                        @if (ViewBag.PromoMessage != null) { <small class="text-success mt-1">@ViewBag.PromoMessage</small> }
-                        @if (ViewBag.PromoError != null) { <small class="text-danger mt-1">@ViewBag.PromoError</small> }
-                    </form>
-
+            <div class="card border-0 shadow-sm border-top border-primary border-4 mb-4">
+                <div class="card-body p-4">
+                    <h5 class="fw-bold mb-4">สรุปคำสั่งซื้อ</h5>
+                    
                     <div class="d-flex justify-content-between mb-2">
-                        <span>ยอดรวมสินค้า</span>
-                        <span>@ViewBag.TotalAmount.ToString("N2") ฿</span>
+                        <span class="text-muted">ยอดรวมสินค้า:</span>
+                        <span class="fw-bold">@ViewBag.TotalAmount.ToString("N0") ฿</span>
                     </div>
-                    <div class="d-flex justify-content-between mb-2 text-success">
-                        <span>ส่วนลด</span>
-                        <span>- @ViewBag.DiscountAmount.ToString("N2") ฿</span>
-                    </div>
-                    <hr>
-                    <div class="d-flex justify-content-between mb-4">
-                        <h5 class="fw-bold">ยอดชำระสุทธิ</h5>
-                        <h4 class="fw-bold text-primary">@ViewBag.NetAmount.ToString("N2") ฿</h4>
+                    
+                    @if(ViewBag.AutoDiscountAmount > 0 || (ViewBag.AutoPromoMessages != null && ViewBag.AutoPromoMessages.Count > 0)) {
+                        <div class="d-flex justify-content-between mb-2 text-success">
+                            <span><i class="fa-solid fa-bolt text-warning"></i> ส่วนลดอัตโนมัติ:</span>
+                            <span class="fw-bold">-@ViewBag.AutoDiscountAmount.ToString("N0") ฿</span>
+                        </div>
+                        <div class="mb-2 ps-3 border-start border-success bg-light py-2 rounded">
+                            @foreach(var msg in ViewBag.AutoPromoMessages) {
+                                <small class="d-block text-success fw-semibold">- @msg</small>
+                            }
+                        </div>
+                    }
+
+                    <div class="d-flex justify-content-between mb-3 text-danger" id="manualVoucherRow" style="display: none !important;">
+                        <span><i class="fa-solid fa-ticket"></i> คูปองที่ใช้:</span>
+                        <span class="fw-bold" id="ManualDiscountDisplay">0 ฿</span>
                     </div>
 
-                    <button type="submit" form="checkoutForm" class="btn btn-primary btn-lg w-100">ยืนยันสั่งซื้อสินค้า</button>
+                    <hr>
+                    <div class="d-flex justify-content-between align-items-center">
+                        <span class="fw-bold fs-5">ยอดชำระสุทธิ:</span>
+                        <span class="fw-bold fs-3 text-primary" id="NetDisplay">@ViewBag.NetBeforeManualVoucher.ToString("N0") ฿</span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="card border-0 shadow-sm rounded-4 mb-4">
+                <div class="card-body p-4">
+                    <h5 class="fw-bold mb-3"><i class="fa-solid fa-ticket text-danger me-2"></i> เลือกคูปองส่วนลด</h5>
+                    
+                    @if (ViewBag.MyVouchers != null && ViewBag.MyVouchers.Count > 0)
+                    {
+                        <h6 class="text-muted fw-bold small mb-2">คูปองส่วนตัวของคุณ</h6>
+                        <div class="row g-2 mb-3">
+                            @foreach (var v in ViewBag.MyVouchers)
+                            {
+                                <div class="col-12">
+                                    <div class="border border-warning rounded-3 p-3 bg-light d-flex justify-content-between align-items-center">
+                                        <div>
+                                            <div class="fw-bold text-dark"><i class="fa-solid fa-gift text-warning me-1"></i> @v.VoucherType</div>
+                                            <small class="text-danger fw-bold">ลด @v.DiscountValue.ToString("N0") @(v.IsPercent == true ? "%" : "บาท")</small>
+                                        </div>
+                                        <button type="button" id="btnVoucher_@v.VoucherId" class="btn btn-warning fw-bold btn-sm shadow-sm coupon-btn"
+                                                onclick="toggleDiscount('@v.DiscountValue', '@v.IsPercent.ToString().ToLower()', '@v.VoucherId', 'Voucher')">ใช้</button>
+                                    </div>
+                                </div>
+                            }
+                        </div>
+                    }
+
+                    @if (ViewBag.ActivePromotions != null && ViewBag.ActivePromotions.Count > 0)
+                    {
+                        <h6 class="text-muted fw-bold small mb-2">โค้ดส่วนลดแคมเปญ</h6>
+                        <div class="row g-2">
+                            @foreach (var p in ViewBag.ActivePromotions)
+                            {
+                                <div class="col-12">
+                                    <div class="border border-danger rounded-3 p-3 d-flex justify-content-between align-items-center">
+                                        <div>
+                                            <div class="fw-bold text-danger border border-danger px-2 rounded d-inline-block mb-1">@p.ConditionValue</div>
+                                            <small class="d-block text-muted">ลด @p.DiscountValue.ToString("N0") @(p.IsPercent == true ? "%" : "บาท")</small>
+                                        </div>
+                                        <button type="button" id="btnPromo_@p.PromotionId" class="btn btn-outline-danger fw-bold btn-sm coupon-btn"
+                                                onclick="toggleDiscount('@p.DiscountValue', '@p.IsPercent.ToString().ToLower()', '@p.PromotionId', 'Promo')">ใช้</button>
+                                    </div>
+                                </div>
+                            }
+                        </div>
+                    }
+
+                    @if ((ViewBag.MyVouchers == null || ViewBag.MyVouchers.Count == 0) && (ViewBag.ActivePromotions == null || ViewBag.ActivePromotions.Count == 0))
+                    {
+                        <div class="alert alert-secondary text-center mb-0">ไม่มีคูปองที่สามารถใช้งานได้ในขณะนี้</div>
+                    }
                 </div>
             </div>
         </div>
     </div>
 </div>
+
+@section Scripts {
+    <script>
+        // 🌟 สคริปต์สำหรับปลดล็อคกล่องที่อยู่
+        function enableEditAddress() {
+            let addrField = document.getElementById('addressField');
+            addrField.readOnly = false;
+            addrField.classList.remove('bg-light');
+            addrField.focus();
+        }
+
+        // 🌟 สคริปต์สำหรับระบบ Toggle คูปอง
+        let autoDiscount = parseFloat('@ViewBag.AutoDiscountAmount');
+        let originalTotal = parseFloat('@ViewBag.TotalAmount');
+        let netBeforeVoucher = parseFloat('@ViewBag.NetBeforeManualVoucher');
+        
+        let activeCouponId = null;
+        let activeCouponType = null;
+
+        function toggleDiscount(discountValue, isPercent, itemId, type) {
+            
+            // 1. รีเซ็ตหน้าตาปุ่มคูปองทั้งหมดกลับเป็นปกติ
+            document.querySelectorAll('.coupon-btn').forEach(btn => {
+                btn.innerText = 'ใช้';
+                btn.classList.remove('btn-secondary');
+                if(btn.id.startsWith('btnVoucher')) {
+                    btn.classList.add('btn-warning');
+                } else {
+                    btn.classList.add('btn-outline-danger');
+                }
+            });
+
+            // 2. เช็คว่าเป็นการ "กดยกเลิก" (กดปุ่มเดิมซ้ำ) หรือไม่?
+            if (activeCouponId === itemId && activeCouponType === type) {
+                // คืนค่ากลับเป็นปกติ
+                activeCouponId = null;
+                activeCouponType = null;
+                
+                document.getElementById('manualVoucherRow').style.setProperty("display", "none", "important");
+                document.getElementById('NetDisplay').innerText = netBeforeVoucher.toLocaleString() + " ฿";
+                document.getElementById('FormDiscountAmount').value = autoDiscount;
+                document.getElementById('FormNetAmount').value = netBeforeVoucher;
+                document.getElementById('FormUsedVoucherId').value = ""; 
+                document.getElementById('FormUsedPromotionId').value = ""; 
+                return; // หยุดการทำงานแค่นี้
+            }
+
+            // 3. ถ้าเป็นการ "กดใช้คูปองใหม่"
+            activeCouponId = itemId;
+            activeCouponType = type;
+
+            // เปลี่ยนหน้าตาปุ่มที่โดนกดให้เป็นสีเทาและเขียนว่า "ยกเลิก"
+            let clickedBtn = document.getElementById('btn' + type + '_' + itemId);
+            clickedBtn.innerText = 'ยกเลิก';
+            clickedBtn.className = 'btn btn-secondary fw-bold btn-sm shadow-sm coupon-btn';
+
+            // คำนวณส่วนลด
+            let manualDiscount = 0;
+            if (isPercent === "true") {
+                manualDiscount = netBeforeVoucher * (parseFloat(discountValue) / 100);
+            } else {
+                manualDiscount = parseFloat(discountValue);
+            }
+
+            let totalDiscount = autoDiscount + manualDiscount;
+            let finalNet = originalTotal - totalDiscount;
+            if (finalNet < 0) finalNet = 0;
+
+            // อัปเดตหน้าจอ
+            document.getElementById('manualVoucherRow').style.setProperty("display", "flex", "important");
+            document.getElementById('ManualDiscountDisplay').innerText = "-" + manualDiscount.toLocaleString() + " ฿";
+            document.getElementById('NetDisplay').innerText = finalNet.toLocaleString() + " ฿";
+
+            document.getElementById('FormDiscountAmount').value = totalDiscount;
+            document.getElementById('FormNetAmount').value = finalNet;
+            
+            if (type === 'Voucher') {
+                document.getElementById('FormUsedVoucherId').value = itemId;
+                document.getElementById('FormUsedPromotionId').value = ""; 
+            } else {
+                document.getElementById('FormUsedPromotionId').value = itemId;
+                document.getElementById('FormUsedVoucherId').value = ""; 
+            }
+        }
+    </script>
+}

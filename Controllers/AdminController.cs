@@ -457,21 +457,43 @@ namespace Stepify.Controllers
         [Authorize(Roles = "Admin")]
         public IActionResult ManagePromotions()
         {
-            // ดึงโค้ดส่วนลดทั้งหมดมาแสดง (เรียงจากล่าสุดไปเก่าสุด)
+            // ดึงแบรนด์ทั้งหมดที่มีในระบบ (ตัดค่าซ้ำ และเอาเฉพาะที่ไม่ว่างเปล่า)
+            ViewBag.Brands = _db.Products
+                                .Where(p => !string.IsNullOrEmpty(p.Brand))
+                                .Select(p => p.Brand)
+                                .Distinct()
+                                .ToList();
+
             var promos = _db.Promotions.OrderByDescending(p => p.PromotionId).ToList();
             return View(promos);
         }
 
-        // ==========================================
+       // ==========================================
         // 18. ฟังก์ชันเพิ่มโปรโมชั่นใหม่ (POST)
         // ==========================================
         [HttpPost]
         [Authorize(Roles = "Admin")]
         public IActionResult AddPromotion(Promotion data)
         {
-            // ตั้งค่าเริ่มต้นให้พร้อมใช้งานทันที
-            data.IsActive = true;
+            // 🌟 พระเอกกู้ชีพ: แก้ปัญหา พ.ศ. กับ ค.ศ. ตีกัน
+            if (data.ExpiryDate.HasValue && data.ExpiryDate.Value.Year < 1753)
+            {
+                if (data.ExpiryDate.Value.Year == 1)
+                {
+                    // กรณีบั๊กปี 0001 ให้เป็นค่าว่าง (ไม่มีวันหมดอายุ)
+                    data.ExpiryDate = null;
+                }
+                else
+                {
+                    // กรณีที่ C# เข้าใจผิดว่า ค.ศ. 2026 คือ พ.ศ. 2026 (ลบไปจนเหลือ ค.ศ. 1483)
+                    // เราก็แค่บวก 543 คืนกลับไป ให้มันกลายเป็น 2026 เหมือนเดิม!
+                    data.ExpiryDate = data.ExpiryDate.Value.AddYears(543);
+                }
+            }
 
+            // บังคับให้โปรโมชั่นที่สร้างใหม่ เปิดใช้งานทันที
+            data.IsActive = true; 
+            
             _db.Promotions.Add(data);
             _db.SaveChanges();
 

@@ -8,7 +8,7 @@
     <div class="d-flex justify-content-between align-items-center mb-4">
         <h3 class="fw-bold"><i class="fa-solid fa-tags text-danger"></i> จัดการโปรโมชั่นและส่วนลด</h3>
         <button class="btn btn-danger" data-bs-toggle="modal" data-bs-target="#addPromoModal">
-            <i class="fa-solid fa-plus"></i> สร้างโค้ดส่วนลด
+            <i class="fa-solid fa-plus"></i> สร้างแคมเปญใหม่
         </button>
     </div>
 
@@ -17,10 +17,12 @@
             <table class="table table-hover align-middle mb-0">
                 <thead class="table-dark">
                     <tr>
-                        <th class="ps-4">โค้ดส่วนลด (Code)</th>
-                        <th class="text-center">มูลค่าส่วนลด</th>
-                        <th class="text-center">ประเภท</th>
-                        <th class="text-center">สถานะใช้งาน</th>
+                        <th class="ps-4">ชื่อแคมเปญ</th>
+                        <th>ประเภท</th>
+                        <th>เงื่อนไข/โค้ด</th>
+                        <th class="text-center">ส่วนลด</th>
+                        <th class="text-center">หมดอายุ</th>
+                        <th class="text-center">สถานะ</th>
                         <th class="text-center pe-4">จัดการ</th>
                     </tr>
                 </thead>
@@ -30,34 +32,23 @@
                         foreach (var item in Model)
                         {
                             <tr>
-                                <td class="ps-4">
-                                    <span class="badge bg-light text-danger border border-danger fs-6 tracking-widest">@item.ConditionValue</span>
-                                </td>
-                                <td class="text-center text-success fw-bold">
-                                    @item.DiscountValue
-                                </td>
+                                <td class="ps-4 fw-bold">@item.PromoName</td>
+                                <td><span class="badge bg-primary">@item.PromoType</span></td>
+                                <td><span class="badge bg-light text-danger border border-danger">@item.ConditionValue</span></td>
+                                <td class="text-center text-success fw-bold">@item.DiscountValue @(item.IsPercent == true ? "%" : "฿")</td>
+                                <td class="text-center text-muted">@(item.ExpiryDate?.ToString("dd/MM/yyyy") ?? "ไม่มีวันหมดอายุ")</td>
                                 <td class="text-center">
-                                    @(item.IsPercent == true ? "ลดเป็นเปอร์เซ็นต์ (%)" : "ลดเป็นเงินสด (บาท)")
-                                </td>
-                                <td class="text-center">
-                                    @if(item.IsActive == true) { 
-                                        <span class="badge bg-success"><i class="fa-solid fa-circle-check"></i> ใช้งานอยู่</span> 
-                                    } else { 
-                                        <span class="badge bg-secondary"><i class="fa-solid fa-circle-xmark"></i> ปิดใช้งาน</span> 
-                                    }
+                                    @if(item.IsActive == true) { <span class="badge bg-success">ใช้งานอยู่</span> } 
+                                    else { <span class="badge bg-secondary">ปิดใช้งาน</span> }
                                 </td>
                                 <td class="text-center pe-4">
                                     <a asp-action="TogglePromotion" asp-route-id="@item.PromotionId" class="btn btn-sm @(item.IsActive == true ? "btn-warning" : "btn-success")">
-                                        @(item.IsActive == true ? "ปิดใช้งาน" : "เปิดใช้งาน")
+                                        @(item.IsActive == true ? "ปิด" : "เปิด")
                                     </a>
-                                    <a asp-action="DeletePromotion" asp-route-id="@item.PromotionId" class="btn btn-sm btn-outline-danger" onclick="return confirm('ยืนยันการลบโค้ดนี้?');">ลบ</a>
+                                    <a asp-action="DeletePromotion" asp-route-id="@item.PromotionId" class="btn btn-sm btn-outline-danger" onclick="return confirm('ลบโค้ดนี้?');">ลบ</a>
                                 </td>
                             </tr>
                         }
-                    }
-                    else
-                    {
-                        <tr><td colspan="5" class="text-center py-4 text-muted">ยังไม่มีโปรโมชั่นในระบบ</td></tr>
                     }
                 </tbody>
             </table>
@@ -69,35 +60,112 @@
     <div class="modal-dialog">
         <div class="modal-content border-0 shadow">
             <div class="modal-header bg-danger text-white">
-                <h5 class="modal-title fw-bold"><i class="fa-solid fa-ticket"></i> สร้างโค้ดส่วนลดใหม่</h5>
+                <h5 class="modal-title fw-bold"><i class="fa-solid fa-ticket"></i> สร้างแคมเปญใหม่</h5>
                 <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
             </div>
             <form asp-action="AddPromotion" method="post">
                 <div class="modal-body">
                     <div class="mb-3">
-                        <label class="form-label fw-bold text-danger">รหัสโค้ดส่วนลด (Code)</label>
-                        <input type="text" name="ConditionValue" class="form-control text-uppercase fw-bold" placeholder="เช่น NEWYEAR50" required />
+                        <label class="form-label fw-bold">ชื่อโปรโมชั่น (แอดมินเห็น)</label>
+                        <input type="text" name="PromoName" class="form-control" placeholder="เช่น โปรลดล้างสต๊อก" required />
                     </div>
-                    <div class="row">
+                    
+                    <div class="mb-3">
+                        <label class="form-label fw-bold text-primary">ประเภทโปรโมชั่น</label>
+                        <select name="PromoType" id="promoType" class="form-select fw-bold" required onchange="toggleFormInputs()">
+                            <option value="Coupon">🎫 โค้ดส่วนลด (แจกให้ลูกค้ากดใช้หน้าตะกร้า)</option>
+                            <option value="Brand">🔥 ลดเฉพาะแบรนด์ (หักให้อัตโนมัติ)</option>
+                            <option value="Threshold">💰 ซื้อครบ X บาท (หักให้อัตโนมัติ)</option>
+                            <option value="B2G1">👟 ซื้อ 2 แถม 1 (แถมคู่ถูกสุดอัตโนมัติ)</option>
+                            <option value="Shipping">🚚 ส่งฟรีไม่มีขั้นต่ำ</option>
+                        </select>
+                    </div>
+
+                    <div class="mb-3 bg-light p-3 rounded border">
+                        <label id="conditionLabel" class="form-label fw-bold text-danger">รหัสโค้ดส่วนลด</label>
+                        
+                        <input type="text" id="conditionText" name="ConditionValue" class="form-control text-uppercase" placeholder="เช่น SALE10" required />
+                        
+                        <select id="conditionBrand" name="ConditionValue" class="form-select fw-bold text-danger" disabled style="display:none;">
+                            @if(ViewBag.Brands != null) {
+                                foreach(var b in ViewBag.Brands) {
+                                    <option value="@b">แบรนด์ @b</option>
+                                }
+                            }
+                        </select>
+                    </div>
+
+                    <div class="row" id="discountZone">
                         <div class="col-6 mb-3">
                             <label class="form-label fw-bold">ประเภทส่วนลด</label>
-                            <select name="IsPercent" class="form-select" required>
-                                <option value="true">ลดเป็น %</option>
-                                <option value="false">ลดเป็นบาท</option>
+                            <select name="IsPercent" class="form-select">
+                                <option value="true">ลดเป็นเปอร์เซ็นต์ (%)</option>
+                                <option value="false">ลดเป็นเงินสด (บาท)</option>
                             </select>
                         </div>
                         <div class="col-6 mb-3">
                             <label class="form-label fw-bold">มูลค่าที่ลด</label>
-                            <input type="number" name="DiscountValue" class="form-control" step="0.01" min="1" placeholder="เช่น 50" required />
+                            <input type="number" id="discountValue" name="DiscountValue" class="form-control" step="0.01" min="0" placeholder="เช่น 50" required />
                         </div>
                     </div>
-                    <small class="text-muted">* โค้ดที่สร้างใหม่จะถูกเปิดใช้งานทันทีอัตโนมัติ</small>
+
+                    <div class="mb-3">
+                        <label class="form-label fw-bold"><i class="fa-regular fa-clock"></i> วันที่หมดอายุ (ถ้ามี)</label>
+                        <input type="date" name="ExpiryDate" class="form-control" />
+                        <small class="text-muted">* ปล่อยว่างไว้หากเป็นโปรโมชั่นแบบถาวร</small>
+                    </div>
                 </div>
                 <div class="modal-footer bg-light">
                     <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">ยกเลิก</button>
-                    <button type="submit" class="btn btn-danger fw-bold">บันทึกโค้ดส่วนลด</button>
+                    <button type="submit" class="btn btn-danger fw-bold px-4">บันทึกแคมเปญ</button>
                 </div>
             </form>
         </div>
     </div>
 </div>
+
+<script>
+function toggleFormInputs() {
+    var type = document.getElementById('promoType').value;
+    var textInput = document.getElementById('conditionText');
+    var brandInput = document.getElementById('conditionBrand');
+    var label = document.getElementById('conditionLabel');
+    var discountZone = document.getElementById('discountZone');
+    var discountValue = document.getElementById('discountValue');
+
+    // รีเซ็ตทุกอย่างกลับเป็นปกติก่อน
+    textInput.disabled = false; textInput.style.display = 'block';
+    brandInput.disabled = true; brandInput.style.display = 'none';
+    discountZone.style.display = 'flex';
+    discountValue.required = true;
+    textInput.readOnly = false;
+
+    if(type === 'Brand') {
+        label.innerHTML = '<i class="fa-solid fa-tags"></i> เลือกแบรนด์ที่ต้องการจัดโปร';
+        textInput.disabled = true; textInput.style.display = 'none';
+        brandInput.disabled = false; brandInput.style.display = 'block';
+    } 
+    else if (type === 'Threshold') {
+        label.innerHTML = '<i class="fa-solid fa-sack-dollar"></i> ต้องมียอดซื้อขั้นต่ำกี่บาท?';
+        textInput.placeholder = 'เช่น 2000';
+        textInput.type = 'number';
+    } 
+    else if (type === 'Coupon') {
+        label.innerHTML = '<i class="fa-solid fa-barcode"></i> ตั้งชื่อรหัสโค้ดส่วนลด';
+        textInput.placeholder = 'เช่น PAYDAY50';
+        textInput.type = 'text';
+    } 
+    else if (type === 'B2G1' || type === 'Shipping') {
+        label.innerHTML = '<i class="fa-solid fa-robot"></i> เงื่อนไขการทำงาน';
+        textInput.value = 'AUTO_CALCULATE'; // ใส่ค่าหลอกไว้ให้ผ่าน Validate
+        textInput.readOnly = true;
+        
+        // ซ่อนช่องใส่เงินส่วนลด เพราะระบบคำนวณให้เอง
+        discountZone.style.display = 'none';
+        discountValue.required = false;
+        discountValue.value = 0;
+    }
+}
+// เรียกใช้งาน 1 ครั้งตอนเปิดหน้าเว็บเพื่อเซ็ตค่าเริ่มต้น
+window.onload = toggleFormInputs;
+</script>

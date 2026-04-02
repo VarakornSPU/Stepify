@@ -1,0 +1,97 @@
+@model Stepify.Models.Db.User
+@{
+  ViewData["Title"] = "โปรไฟล์ของฉัน";
+}
+
+<div class="container mt-5 mb-5">
+  <div class="row justify-content-center">
+    <div class="col-md-8">
+      <h3 class="fw-bold mb-4"><i class="fa-solid fa-user-circle text-primary"></i> โปรไฟล์และที่อยู่จัดส่ง</h3>
+            
+      @if (TempData["SuccessMsg"] != null)
+      {
+        <div class="alert alert-success alert-dismissible fade show shadow-sm" role="alert">
+          <i class="fa-solid fa-check-circle me-2"></i> @TempData["SuccessMsg"]
+          <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>
+      }
+
+      <div class="card border-0 shadow-sm">
+        <div class="card-body p-4 p-md-5">
+          <form asp-controller="Auth" asp-action="UpdateProfile" method="post">
+                        
+            <div class="row">
+              <div class="col-md-6 mb-3">
+                <label class="form-label fw-bold">อีเมล (ล็อกอิน)</label>
+                <input type="email" class="form-control bg-light" value="@Model.Email" readonly />
+                <small class="text-muted">ไม่สามารถเปลี่ยนอีเมลได้</small>
+              </div>
+              <div class="col-md-6 mb-3">
+                <label class="form-label fw-bold">รหัสผ่านใหม่ (หากต้องการเปลี่ยน)</label>
+                <input type="password" name="NewPassword" class="form-control"
+                       placeholder="ปล่อยว่างไว้ถ้าไม่ต้องการเปลี่ยน" />
+              </div>
+            </div>
+
+            <div class="row">
+              <div class="col-md-6 mb-3">
+                <label class="form-label fw-bold">ชื่อ-นามสกุล</label>
+                <input type="text" name="Username" class="form-control" value="@Model.Username" required />
+              </div>
+              <div class="col-md-6 mb-4">
+                <label class="form-label fw-bold">เบอร์โทรศัพท์</label>
+                <input type="text" name="Tel" class="form-control" value="@Model.Tel" placeholder="08X-XXX-XXXX" />
+              </div>
+            </div>
+
+            <hr class="mb-4">
+
+            <div class="mb-4">
+                <div class="d-flex justify-content-between align-items-center mb-2">
+                    <label class="form-label fw-bold mb-0">
+                        <i class="fa-solid fa-location-dot text-danger me-1"></i> ที่อยู่จัดส่งหลัก
+                    </label>
+                    <button type="button" class="btn btn-sm btn-outline-secondary" data-bs-toggle="collapse" data-bs-target="#addressEditBox">
+                        <i class="fa-solid fa-pen"></i> แก้ไขที่อยู่
+                    </button>
+                </div>
+
+                @if (!string.IsNullOrEmpty(Model.Address))
+                {
+                    <div class="p-3 bg-white border border-2 border-danger rounded-3 shadow-sm position-relative mb-2">
+                        <span class="badge bg-danger position-absolute top-0 end-0 mt-2 me-2">ค่าเริ่มต้น</span>
+                        <div class="d-flex align-items-start">
+                            <div class="bg-light p-2 rounded-circle me-3">
+                                <i class="fa-solid fa-house text-danger fs-5"></i>
+                            </div>
+                            <div>
+                                <div class="fw-bold mb-1">@Model.Username <span class="text-muted fw-normal ms-2">(@Model.Tel)</span></div>
+                                <p class="mb-0 text-muted" style="white-space: pre-wrap;">@Model.Address</p>
+                            </div>
+                        </div>
+                    </div>
+                }
+                else
+                {
+                    <div class="alert alert-warning py-2 mb-2">
+                        <i class="fa-solid fa-triangle-exclamation me-1"></i> คุณยังไม่มีที่อยู่จัดส่งหลัก กรุณาเพิ่มที่อยู่
+                    </div>
+                }
+
+                <div class="collapse @(string.IsNullOrEmpty(Model.Address) ? "show" : "") mt-3" id="addressEditBox">
+                    <textarea name="Address" class="form-control border-primary" rows="3" placeholder="บ้านเลขที่, ซอย, ถนน, ตำบล, อำเภอ, จังหวัด, รหัสไปรษณีย์">@Model.Address</textarea>
+                    <small class="text-primary d-block mt-2"><i class="fa-solid fa-circle-info"></i> กดปุ่ม "บันทึกข้อมูล" ด้านล่างเพื่ออัปเดตที่อยู่</small>
+                </div>
+            </div>
+
+            <div class="text-end mt-4">
+              <button type="submit" class="btn btn-primary px-5 fw-bold shadow-sm">
+                <i class="fa-solid fa-save me-2"></i> บันทึกข้อมูล
+              </button>
+            </div>
+          </form>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
