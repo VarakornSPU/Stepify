@@ -58,7 +58,13 @@
                 <input type="radio" class="btn-check" name="VariantId" id="variant_@v.VariantId" value="@v.VariantId"
                        autocomplete="off" required>
                 <label class="btn btn-outline-dark px-4" for="variant_@v.VariantId">
-                  @v.Size <br><small style="font-size:0.7rem;">(เหลือ @v.StockQty คู่)</small>
+                  ไซส์: @v.Size
+                  @if (!string.IsNullOrEmpty(v.Color))
+                  {
+                    <span> | สี: @v.Color</span>
+                  }
+                  <br>
+                  <small style="font-size:0.7rem;">(เหลือ @v.StockQty คู่)</small>
                 </label>
               }
             </div>
