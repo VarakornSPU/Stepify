@@ -388,6 +388,22 @@ namespace Stepify.Controllers
             var order = _db.Orders.FirstOrDefault(o => o.OrderId == OrderId);
             if (order != null)
             {
+                // 🌟 เพิ่มเงื่อนไขตรวจสอบ: ถ้าแอดมินเลือกสถานะเป็น "Cancelled" 
+                // และสถานะเดิมไม่ใช่ "Cancelled" (ป้องกันการคืนสต๊อกเบิ้ลหากแอดมินกดเซฟซ้ำ)
+                if (ShippingStatus == "Cancelled" && order.ShippingStatus != "Cancelled")
+                {
+                    var orderDetails = _db.OrderDetails.Where(od => od.OrderId == OrderId).ToList();
+                    foreach (var item in orderDetails)
+                    {
+                        var variant = _db.ProductVariants.FirstOrDefault(v => v.VariantId == item.VariantId);
+                        if (variant != null)
+                        {
+                            variant.StockQty = (variant.StockQty ?? 0) + item.Quantity;
+                            _db.ProductVariants.Update(variant);
+                        }
+                    }
+                }
+
                 order.PaymentStatus = PaymentStatus;
                 order.ShippingStatus = ShippingStatus;
                 order.TrackingNumber = TrackingNumber;

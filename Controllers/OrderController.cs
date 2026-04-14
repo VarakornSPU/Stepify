@@ -303,5 +303,39 @@ namespace Stepify.Controllers
         return Json(new { success = false, message = ex.Message });
       }
     }
+    [HttpPost]
+    public IActionResult CancelOrder(int orderId)
+    {
+      int currentUserId = int.Parse(User.FindFirst("UserId").Value);
+      var order = _db.Orders.FirstOrDefault(o => o.OrderId == orderId && o.UserId == currentUserId);
+
+      // อนุญาตให้ยกเลิกเฉพาะบิลที่เพิ่งสั่งและยังไม่ได้จัดส่ง (เช่น สถานะ "Packing") 
+      // และสถานะต้องไม่ใช่ "Cancelled" อยู่แล้วเพื่อป้องกันการคืนสต๊อกซ้ำ
+      if (order != null && order.ShippingStatus == "Packing")
+      {
+        // 1. ดึงข้อมูลสินค้าย่อยในบิลนี้
+        var orderDetails = _db.OrderDetails.Where(od => od.OrderId == orderId).ToList();
+
+        // 2. วนลูปคืนค่าสต๊อกให้แต่ละ Variant
+        foreach (var item in orderDetails)
+        {
+          var variant = _db.ProductVariants.FirstOrDefault(v => v.VariantId == item.VariantId);
+          if (variant != null)
+          {
+            variant.StockQty = (variant.StockQty ?? 0) + item.Quantity;
+            _db.ProductVariants.Update(variant);
+          }
+        }
+
+        // 3. ปรับสถานะบิลเป็น Cancelled
+        order.ShippingStatus = "Cancelled";
+        order.PaymentStatus = "Cancelled"; // หรือปรับสถานะการเงินตามความเหมาะสมของระบบ
+
+        _db.Orders.Update(order);
+        _db.SaveChanges();
+      }
+
+      return RedirectToAction("History"); // กลับไปหน้าประวัติการสั่งซื้อ
+    }
   }
 }

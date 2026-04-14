@@ -30,58 +30,104 @@
                                 <td>@(order.OrderDate?.ToString("dd/MM/yyyy HH:mm"))</td>
                                 <td class="fw-bold text-success">@order.NetAmount.ToString("N2") ฿</td>
                                 <td>
-                                    @if(order.PaymentStatus == "Pending") { <span class="badge bg-warning text-dark">รอชำระเงิน</span> }
-                                    else if(order.PaymentStatus == "Paid") { <span class="badge bg-success">ชำระเงินแล้ว</span> }
-                                    else { <span class="badge bg-success">@order.PaymentStatus</span> }
+                                    @if (order.PaymentStatus == "Pending")
+                                    {
+                                        <span class="badge bg-warning text-dark">รอชำระเงิน</span>
+                                    }
+                                    else if (order.PaymentStatus == "Paid")
+                                    {
+
+                                        <span class="badge bg-success">ชำระเงินแล้ว</span>
+                                    }
+                                    else
+                                    {
+
+                                        <span class="badge bg-success">@order.PaymentStatus</span>
+                                    }
                                 </td>
                                 
                                 <td>
-                                    @if(order.ShippingStatus == "Packing") 
-                                    { 
-                                        <span class="badge bg-secondary">กำลังจัดเตรียม</span> 
+                                    @if (order.ShippingStatus == "Packing")
+                                    {
+                                        <span class="badge bg-secondary">กำลังจัดเตรียม</span>
                                     }
-                                    else if(order.ShippingStatus == "Shipped") 
-                                    { 
-                                        <span class="badge bg-info"><i class="fa-solid fa-truck-fast me-1"></i>กำลังจัดส่ง</span> 
+                                    else if (order.ShippingStatus == "Shipped")
+                                    {
+                                        <span class="badge bg-info"><i class="fa-solid fa-truck-fast me-1"></i>กำลังจัดส่ง</span>
                                     }
-                                    else if(order.ShippingStatus == "Completed") 
-                                    { 
-                                        <span class="badge bg-success"><i class="fa-solid fa-box-open me-1"></i>ได้รับสินค้าแล้ว</span> 
-                                    }
-                                    else 
-                                    { 
-                                        <span class="badge bg-secondary">@order.ShippingStatus</span> 
-                                    }
-                                </td>
-                                
-                                <td class="text-center pe-4">
-                                    <div class="d-flex justify-content-center gap-2">
-                                        <a asp-action="Details" asp-route-id="@order.OrderId" class="btn btn-sm btn-outline-primary">ดูรายละเอียด</a>
-                                        
-                                        @if (order.ShippingStatus == "Shipped")
-                                        {
-                                            <form asp-controller="Order" asp-action="ConfirmReceive" method="post" class="d-inline">
-                                                <input type="hidden" name="orderId" value="@order.OrderId" />
-                                                <button type="submit" class="btn btn-sm btn-success shadow-sm" 
-                                                        onclick="return confirm('คุณได้รับสินค้าและตรวจสอบความเรียบร้อยแล้วใช่หรือไม่?');">
-                                                    <i class="fa-solid fa-check me-1"></i> ได้รับสินค้า
-                                                </button>
-                                            </form>
+                                    else if (order.ShippingStatus == "Completed")
+                                    {
+                                        <span class="badge bg-success"><i
+                                            class="fa-solid fa-box-open me-1"></i>ได้รับสินค้าแล้ว</span>
                                         }
-                                    </div>
-                                </td>
-                            </tr>
-                        }
-                    </tbody>
-                </table>
+                                    else
+                                        {
+                                            <span class="badge bg-secondary">@order.ShippingStatus</span>
+                                        }
+                                    </td>
+                                
+                                    <td class="text-center pe-4">
+                                        <div class="d-flex justify-content-center gap-2">
+                                            <a asp-action="Details" asp-route-id="@order.OrderId"
+                                               class="btn btn-sm btn-outline-primary">ดูรายละเอียด</a>
+                                            @if (order.ShippingStatus == "Packing")
+                                            {
+                                                <form asp-controller="Order" asp-action="CancelOrder" method="post"
+                                                      style="display:inline;">
+                                                    <input type="hidden" name="orderId" value="@order.OrderId" />
+                                                    <button type="submit" class="btn btn-danger btn-sm"
+                                                            onclick="return confirm('คุณแน่ใจหรือไม่ว่าต้องการยกเลิกคำสั่งซื้อนี้? ระบบจะคืนสต๊อกสินค้าทันที');">
+                                                        ยกเลิกคำสั่งซื้อ
+                                                    </button>
+                                                </form>
+                                            }
+                                            else if (order.ShippingStatus == "Shipped")
+                                            {
+                                                <button type="button" class="btn btn-secondary btn-sm" disabled
+                                                        title="พัสดุอยู่ระหว่างจัดส่ง ไม่สามารถยกเลิกได้">
+                                                    กำลังจัดส่ง (ยกเลิกไม่ได้)
+                                                </button>
+    
+                                                <form asp-controller="Order" asp-action="ConfirmReceive" method="post"
+                                                      style="display:inline;">
+                                                    <input type="hidden" name="orderId" value="@order.OrderId" />
+                                                    <button type="submit" class="btn btn-success btn-sm">ฉันได้รับสินค้าแล้ว</button>
+                                                </form>
+                                            }
+                                            else if (order.ShippingStatus == "Completed")
+                                            {
+                                                <button type="button" class="btn btn-light btn-sm" disabled>
+                                                    เสร็จสิ้น / รับพัสดุแล้ว
+                                                </button>
+                                            }
+                                            else if (order.ShippingStatus == "Cancelled")
+                                            {
+                                                <span class="badge bg-danger">คำสั่งซื้อถูกยกเลิก</span>
+                                            }
+                                            @if (order.ShippingStatus == "Shipped")
+                                            {
+                                                <form asp-controller="Order" asp-action="ConfirmReceive" method="post" class="d-inline">
+                                                    <input type="hidden" name="orderId" value="@order.OrderId" />
+                                                    <button type="submit" class="btn btn-sm btn-success shadow-sm"
+                                                            onclick="return confirm('คุณได้รับสินค้าและตรวจสอบความเรียบร้อยแล้วใช่หรือไม่?');">
+                                                        <i class="fa-solid fa-check me-1"></i> ได้รับสินค้า
+                                                    </button>
+                                                </form>
+                                            }
+                                        </div>
+                                    </td>
+                                </tr>
+                            }
+                        </tbody>
+                    </table>
+                </div>
             </div>
-        </div>
-    }
+        }
     else
-    {
-        <div class="text-center py-5">
-            <h4 class="text-muted">คุณยังไม่มีประวัติการสั่งซื้อ</h4>
-            <a href="/" class="btn btn-primary mt-3">ไปเลือกซื้อสินค้ากันเลย!</a>
-        </div>
-    }
-</div>
+        {
+            <div class="text-center py-5">
+                <h4 class="text-muted">คุณยังไม่มีประวัติการสั่งซื้อ</h4>
+                <a href="/" class="btn btn-primary mt-3">ไปเลือกซื้อสินค้ากันเลย!</a>
+            </div>
+        }
+    </div>

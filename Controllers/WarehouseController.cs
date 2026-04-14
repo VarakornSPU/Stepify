@@ -97,23 +97,45 @@ namespace Stepify.Controllers
       return View(order);
     }
 
-    [HttpPost]
-    public IActionResult UpdateShippingStatus(int OrderId, string ShippingStatus, string TrackingNumber)
+[HttpPost]
+public IActionResult UpdateShippingStatus(int OrderId, string ShippingStatus, string TrackingNumber)
+{
+    var order = _db.Orders.FirstOrDefault(o => o.OrderId == OrderId);
+    if (order != null)
     {
-      var order = _db.Orders.FirstOrDefault(o => o.OrderId == OrderId);
-      if (order != null)
-      {
+        // คืนสต๊อกเมื่อฝ่ายคลังกดยกเลิก
+        if (ShippingStatus == "Cancelled" && order.ShippingStatus != "Cancelled")
+        {
+            var orderDetails = _db.OrderDetails.Where(od => od.OrderId == OrderId).ToList();
+            foreach (var item in orderDetails)
+            {
+                var variant = _db.ProductVariants.FirstOrDefault(v => v.VariantId == item.VariantId);
+                if (variant != null)
+                {
+                    variant.StockQty = (variant.StockQty ?? 0) + item.Quantity;
+                    _db.ProductVariants.Update(variant);
+                }
+            }
+        }
+
         order.ShippingStatus = ShippingStatus;
         if (!string.IsNullOrEmpty(TrackingNumber))
         {
-          order.TrackingNumber = TrackingNumber;
+            order.TrackingNumber = TrackingNumber;
         }
+        
+        // ถ้าคลังกดยกเลิก อาจจะต้องอัปเดตสถานะการจ่ายเงินด้วย
+        if (ShippingStatus == "Cancelled")
+        {
+            order.PaymentStatus = "Cancelled"; 
+        }
+
         _db.Orders.Update(order);
         _db.SaveChanges();
         TempData["SuccessMsg"] = "อัปเดตสถานะการจัดส่งเรียบร้อยแล้ว";
-      }
-      return RedirectToAction("ManageOrders");
     }
+    return RedirectToAction("ManageOrders");
+}
 
     [HttpPost]
     public IActionResult ReportIssue(string Title, string Description)
