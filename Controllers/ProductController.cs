@@ -1,5 +1,6 @@
 using Microsoft.AspNetCore.Mvc;
 using Stepify.Models.Db;
+using Stepify.Models.ViewModels;
 using System.Linq;
 using System.Collections.Generic;
 
@@ -77,24 +78,30 @@ namespace Stepify.Controllers
     // ฟังก์ชันรับข้อมูลรีวิวจากลูกค้า (POST)
     // ==========================================
     [HttpPost]
-    [Microsoft.AspNetCore.Authorization.Authorize] // ต้องล็อกอินถึงจะรีวิวได้
-    public IActionResult AddReview(int ProductId, int Rating, string Comment)
+    [Microsoft.AspNetCore.Authorization.Authorize]
+    public IActionResult AddReview(ReviewViewModel model) // 🌟 2. เปลี่ยนให้รับค่าเป็นคลาส ReviewViewModel
     {
+      // 🌟 3. ตรวจสอบว่าข้อมูลที่ส่งมาถูกต้องไหม (เช่น Rating เกิน 5 ไหม)
+      if (!ModelState.IsValid)
+      {
+        TempData["ErrorMsg"] = "ข้อมูลรีวิวไม่ถูกต้อง";
+        return RedirectToAction("Details", new { id = model.ProductId });
+      }
+
       int currentUserId = int.Parse(User.FindFirst("UserId").Value);
 
-      // 1. ค้นหา OrderId ล่าสุดที่ลูกค้าคนนี้เคยสั่งซื้อสินค้านี้ (เพราะตาราง Review บังคับเก็บ OrderId)
+      // 1. ค้นหา OrderId ล่าสุด
       var latestOrderId = (from o in _db.Orders
                            join od in _db.OrderDetails on o.OrderId equals od.OrderId
                            join v in _db.ProductVariants on od.VariantId equals v.VariantId
-                           where o.UserId == currentUserId && v.ProductId == ProductId
+                           where o.UserId == currentUserId && v.ProductId == model.ProductId // 🌟 4. แก้มาใช้ model.ProductId
                            orderby o.OrderDate descending
                            select o.OrderId).FirstOrDefault();
 
-      // ถ้าหาบิลไม่เจอ แปลว่าไม่ได้ซื้อจริง ให้เด้งกลับ
-      if (latestOrderId == 0) return RedirectToAction("Details", new { id = ProductId });
+      if (latestOrderId == 0) return RedirectToAction("Details", new { id = model.ProductId });
 
-      // 2. เช็คว่าลูกค้าเคยรีวิวสินค้านี้ ในบิลนี้ไปแล้วหรือยัง? (ป้องกันการปั๊มรีวิวเอาคูปอง)
-      bool alreadyReviewed = _db.Reviews.Any(r => r.UserId == currentUserId && r.ProductId == ProductId && r.OrderId == latestOrderId);
+      // 2. เช็คว่าลูกค้าเคยรีวิว
+      bool alreadyReviewed = _db.Reviews.Any(r => r.UserId == currentUserId && r.ProductId == model.ProductId && r.OrderId == latestOrderId);
 
       if (!alreadyReviewed)
       {
@@ -102,27 +109,27 @@ namespace Stepify.Controllers
         var newReview = new Review
         {
           UserId = currentUserId,
-          ProductId = ProductId,
+          ProductId = model.ProductId, // 🌟 4. แก้มาใช้ model.ProductId
           OrderId = latestOrderId,
-          Rating = Rating,
-          Comment = Comment,
+          Rating = model.Rating,       // 🌟 4. แก้มาใช้ model.Rating
+          Comment = model.Comment,     // 🌟 4. แก้มาใช้ model.Comment
           CreatedAt = DateTime.Now,
-          IsRewardClaimed = true // บันทึกว่ารับรางวัลจากรีวิวนี้ไปแล้ว
+          IsRewardClaimed = true
         };
         _db.Reviews.Add(newReview);
 
-        // 🌟 4. ไฮไลท์สำคัญ: แจกคูปอง 100 บาท เข้ากระเป๋าลูกค้าทันที!
+        // 4. แจกคูปอง
         var rewardVoucher = new UserVoucher
         {
           UserId = currentUserId,
           VoucherType = "ส่วนลดแทนคำขอบคุณจากรีวิว",
           DiscountValue = 100,
-          IsPercent = false, // ลดเป็นเงินสด 100 บาท
+          IsPercent = false,
           IsUsed = false
         };
         _db.UserVouchers.Add(rewardVoucher);
 
-        _db.SaveChanges(); // เซฟทุกอย่างลง Database
+        _db.SaveChanges();
 
         TempData["SuccessMsg"] = "ขอบคุณสำหรับรีวิว! คุณได้รับคูปองส่วนลด 100 บาท สำหรับใช้งานในครั้งถัดไป";
       }
@@ -131,11 +138,10 @@ namespace Stepify.Controllers
         TempData["ErrorMsg"] = "คุณได้รีวิวสินค้าจากคำสั่งซื้อนี้ไปแล้ว";
       }
 
-      // รีเฟรชหน้าสินค้าเดิม
-      return RedirectToAction("Details", new { id = ProductId });
+      return RedirectToAction("Details", new { id = model.ProductId });
     }
 
-// ==========================================
+    // ==========================================
     // หน้ารวมสินค้าทั้งหมด (พร้อมระบบค้นหา, กรองแบรนด์, เรียงราคา)
     // ==========================================
     public IActionResult AllProducts(string searchKeyword, string brand, string sort)
@@ -157,7 +163,7 @@ namespace Stepify.Controllers
       // 🌟 1. ระบบ Search (ค้นหาด้วยการพิมพ์ชื่อ หรือ แบรนด์)
       if (!string.IsNullOrEmpty(searchKeyword))
       {
-          productsQuery = productsQuery.Where(p => p.Name.Contains(searchKeyword) || p.Brand.Contains(searchKeyword));
+        productsQuery = productsQuery.Where(p => p.Name.Contains(searchKeyword) || p.Brand.Contains(searchKeyword));
       }
 
       // 🌟 2. ระบบ Filter (กรองด้วยแบรนด์)
